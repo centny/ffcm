@@ -58,10 +58,18 @@ func TestFFCM(t *testing.T) {
 	//
 	//
 	util.Exec("rm", "-f", "xx_*")
+	var fcfg_s = util.NewFcfg3()
+	fcfg_s.InitWithFilePath2("ffcm_s.properties", true)
+
 	var sh = &dtcm_s_h{cw: make(chan int, 100)}
 	var err error
 	go func() {
-		err := RunFFCM_S("ffcm_s.properties", dtm.MemDbc, sh)
+		err := InitDtcmS(fcfg_s, dtm.MemDbc, sh)
+		if err != nil {
+			t.Error(err.Error())
+			return
+		}
+		err = RunFFCM_S_V(fcfg_s)
 		if err != nil {
 			t.Error(err.Error())
 			return
@@ -112,8 +120,8 @@ func TestFFCM(t *testing.T) {
 	AddTask("xx_mm")
 	AddTask("ffcm.sh")
 	//
-	RunFFCM_S("ffcm_s.properties", dtm.MemDbc, sh)
-	RunFFCM_S_V(nil, dtm.MemDbc, sh)
+	// RunFFCM_S("ffcm_s.properties", dtm.MemDbc, sh)
+	// RunFFCM_S_V(nil, dtm.MemDbc, sh)
 	RunFFCM_C("ffcm_c.properties")
 	//
 	// StopFFCM_C()
@@ -135,6 +143,7 @@ func TestFFCM(t *testing.T) {
 		t.Error("error")
 		return
 	}
+	RunFFCM_S_V(nil)
 	//
 	DTCM_C = nil
 	ts.PostN("?tid=%v", "text/plain", bytes.NewBufferString(`
@@ -142,6 +151,7 @@ func TestFFCM(t *testing.T) {
 		progress=end
 		`), "xxx")
 	//
+
 	util.Exec("rm", "-f", "xx_*")
 }
 

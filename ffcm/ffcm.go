@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/Centny/ffcm"
+	"github.com/Centny/ffcm/mdb"
 	"github.com/Centny/gwf/netw/dtm"
+	"github.com/Centny/gwf/util"
 	"os"
 )
 
@@ -64,13 +66,27 @@ func main() {
 		if len(os.Args) > 2 {
 			cfg = os.Args[2]
 		}
-		ffcm.RunFFCM_S(cfg, dtm.MemDbc, dtm.NewDoNoneH())
+		var fcfg_s = util.NewFcfg3()
+		fcfg_s.InitWithFilePath2(cfg, true)
+		var err = ffcm.InitDtcmS(fcfg_s, dtm.MemDbc, dtm.NewDoNoneH())
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		ffcm.RunFFCM_S_V(fcfg_s)
 	case "-s":
 		var cfg = "conf/ffcm_s.properties"
 		if len(os.Args) > 2 {
 			cfg = os.Args[2]
 		}
-		ffcm.RunFFCM_S(cfg, dtm.MemDbc, dtm.NewDoNoneH())
+		var fcfg_s = util.NewFcfg3()
+		fcfg_s.InitWithFilePath2(cfg, true)
+		var err = ffcm.InitDtcmS(fcfg_s, mdb.MdbH_dc, dtm.NewDoNoneH())
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		ffcm.RunFFCM_S_V(fcfg_s)
 	default:
 		usage()
 		ef(1)

@@ -1,7 +1,6 @@
 package ffcm
 
 import (
-	"fmt"
 	"github.com/Centny/gwf/log"
 	"github.com/Centny/gwf/netw/dtm"
 	"github.com/Centny/gwf/routing"
@@ -13,19 +12,25 @@ import (
 var DTCM_S *dtm.DTCM_S = nil
 var W_DIR string = "."
 
-func RunFFCM_S(cfg string, dbc dtm.DB_C, h dtm.DTCM_S_H) error {
-	if DTCM_S != nil {
-		return util.Err("server is running")
-	}
-	var fcfg = util.NewFcfg3()
-	fcfg.InitWithFilePath2(cfg, true)
-	fcfg.Print()
-	return RunFFCM_S_V(fcfg, dbc, h)
+func InitDtcmS(fcfg *util.Fcfg, dbc dtm.DB_C, h dtm.DTCM_S_H) error {
+	var err error
+	DTCM_S, err = dtm.StartDTCM_S(fcfg, dbc, h)
+	return err
 }
 
-func RunFFCM_S_V(fcfg *util.Fcfg, dbc dtm.DB_C, h dtm.DTCM_S_H) error {
-	if DTCM_S != nil {
-		return util.Err("server is running")
+// func RunFFCM_S(cfg string, init bool) error {
+// 	if DTCM_S == nil {
+// 		return util.Err("server is not running")
+// 	}
+// 	var fcfg = util.NewFcfg3()
+// 	fcfg.InitWithFilePath2(cfg, true)
+// 	fcfg.Print()
+// 	return RunFFCM_S_V(fcfg)
+// }
+
+func RunFFCM_S_V(fcfg *util.Fcfg) error {
+	if DTCM_S == nil {
+		return util.Err("server is not running")
 	}
 	var ffprobe_c = fcfg.Val("ffprobe_c")
 	if len(ffprobe_c) > 0 {
@@ -35,19 +40,11 @@ func RunFFCM_S_V(fcfg *util.Fcfg, dbc dtm.DB_C, h dtm.DTCM_S_H) error {
 	if len(w_dir) > 0 {
 		W_DIR = w_dir
 	}
-	var err error
-	DTCM_S, err = dtm.StartDTCM_S(fcfg, dbc, h)
-	if err != nil {
-		return err
-	}
 	var listen = fcfg.Val("listen")
-	if len(listen) > 0 {
-		routing.H("^/status(\\?.*)?", DTCM_S)
-		routing.HFunc("^/addTask(\\?.*)?", AddTaskH)
-		log.D("listen web server on %v", listen)
-		fmt.Println(routing.ListenAndServe(listen))
-	}
-	return err
+	routing.H("^/status(\\?.*)?", DTCM_S)
+	routing.HFunc("^/addTask(\\?.*)?", AddTaskH)
+	log.D("listen web server on %v", listen)
+	return routing.ListenAndServe(listen)
 }
 
 func AddTask(src string) error {

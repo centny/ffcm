@@ -6,7 +6,6 @@ import (
 	"github.com/Centny/gwf/netw/dtm"
 	"github.com/Centny/gwf/routing"
 	"github.com/Centny/gwf/util"
-	"net/http"
 	"strings"
 )
 
@@ -19,15 +18,11 @@ func RunFFCM_C(cfg string) error {
 	var fcfg = util.NewFcfg3()
 	fcfg.InitWithFilePath2(cfg, true)
 	fcfg.Print()
-	var HTTP = &http.Server{}
-	HTTP.Addr = fcfg.Val("listen")
 	routing.HFunc("^/notify(\\?.*)?$", NofityProc)
-	HTTP.Handler = routing.Shared
 	routing.Shared.Print()
 	routing.Shared.ShowLog = true
 	DTCM_C = dtm.StartDTM_C(fcfg)
-	log.D("listen web on %v", HTTP.Addr)
-	return HTTP.ListenAndServe()
+	return DTCM_C.RunProcH()
 }
 
 /*
