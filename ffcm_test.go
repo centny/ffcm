@@ -6,6 +6,7 @@ import (
 	"github.com/Centny/gwf/netw/dtm"
 	"github.com/Centny/gwf/routing/httptest"
 	"github.com/Centny/gwf/util"
+	"regexp"
 	"runtime"
 	"testing"
 	"time"
@@ -78,8 +79,9 @@ func TestFFCM(t *testing.T) {
 	fmt.Println("xxx->")
 	time.Sleep(1 * time.Second)
 	go RunFFCM_C("ffcm_c.properties")
+	time.Sleep(1 * time.Second)
 	fmt.Println("xxxx--->a")
-	err = AddTask("xx.mp4")
+	err = SRV.AddTask("xx.mp4")
 	if err != nil {
 		t.Error(err.Error())
 		return
@@ -89,7 +91,7 @@ func TestFFCM(t *testing.T) {
 	<-sh.cw
 	<-sh.cw
 	util.Exec("rm", "-f", "xx_*")
-	at_ts := httptest.NewServer(AddTaskH)
+	at_ts := httptest.NewServer(SRV.AddTaskH)
 	res, err := at_ts.G2("/addTask?src=%v", "xx.mp4")
 	if res.IntVal("code") != 0 {
 		t.Error("error")
@@ -107,7 +109,7 @@ func TestFFCM(t *testing.T) {
 		t.Error("error")
 		return
 	}
-	ts := httptest.NewServer(NofityProc)
+	ts := httptest.NewServer(CLIENT.NofityProc)
 	ts.PostN("?tid=%v", "text/plain", bytes.NewBufferString(`
 		`), "xxx")
 	ts.PostN("?tid=%v&duration=1111", "text/plain", bytes.NewBufferString(`
@@ -117,8 +119,8 @@ func TestFFCM(t *testing.T) {
 	fmt.Println("xxxx--->d")
 	//
 	util.Exec("cp", "xx.mp4", "xx_mm")
-	AddTask("xx_mm")
-	AddTask("ffcm.sh")
+	SRV.AddTask("xx_mm")
+	SRV.AddTask("ffcm.sh")
 	//
 	// RunFFCM_S("ffcm_s.properties", dtm.MemDbc, sh)
 	// RunFFCM_S_V(nil, dtm.MemDbc, sh)
@@ -131,25 +133,14 @@ func TestFFCM(t *testing.T) {
 	// StopFFCM_C()
 	// StopFFCM_S()
 	//
-	DTCM_S = nil
-	func() {
-		defer func() {
-			fmt.Println(recover())
-		}()
-		AddTask("src")
-	}()
 	res, err = at_ts.G2("/addTask?src=%v", "sfsd")
 	if res.IntVal("code") == 0 {
 		t.Error("error")
 		return
 	}
+	SRV = nil
 	RunFFCM_S_V(nil)
 	//
-	DTCM_C = nil
-	ts.PostN("?tid=%v", "text/plain", bytes.NewBufferString(`
-		xx=
-		progress=end
-		`), "xxx")
 	//
 
 	util.Exec("rm", "-f", "xx_*")
@@ -175,6 +166,16 @@ func TestDim(t *testing.T) {
 	//
 	args = []string{"21x0", "500"}
 	fmt.Println(Dim2(args))
+}
+
+func TestMatch(t *testing.T) {
+	fmt.Println(regexp.MustCompile("^").MatchString("abc.MKV"))
+	fmt.Println(regexp.MustCompile("(?i)^.*\\.[(mkv)(avi)]").MatchString("abc.MKV"))
+	fmt.Println(regexp.MustCompile("(?i)^.*\\.(mkv|avi)$").MatchString("abc.avi"))
+	fmt.Println(regexp.MustCompile("(?i)^.*\\.(mkv|avi)$").MatchString("abc.aVi"))
+	fmt.Println(regexp.MustCompile("(?i)^.*\\.(mkv|avi)$").MatchString("abc.avix"))
+	fmt.Println(regexp.MustCompile("(?i)^.*\\.(mkv|avi)$").MatchString("abc.mkv"))
+	fmt.Println(regexp.MustCompile("^.*\\.[(mp4)]$").MatchString("xxx.mp4"))
 }
 
 // func TestExec(t *testing.T) {

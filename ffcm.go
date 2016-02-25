@@ -10,12 +10,13 @@ import (
 var FFPROBE_C = "ffprobe"
 
 type Video struct {
-	Filename string   `bson:"filename" json:"filename"`
-	Duration float64  `bson:"duration" json:"duration"`
-	Size     int64    `bson:"size" json:"size"`
-	Width    int64    `bson:"width" json:"width"`
-	Height   int64    `bson:"height" json:"height"`
-	Kvs      util.Map `bson:"-" json:"kvs"`
+	Filename string      `bson:"filename" json:"filename"`
+	Duration float64     `bson:"duration" json:"duration"`
+	Size     int64       `bson:"size" json:"size"`
+	Width    int64       `bson:"width" json:"width"`
+	Height   int64       `bson:"height" json:"height"`
+	Kvs      util.Map    `bson:"-" json:"-"`
+	Info     interface{} `bson:"info" json:"info"`
 }
 
 func ParseData(data, reg string) ([]*util.Fcfg, error) {

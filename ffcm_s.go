@@ -9,12 +9,11 @@ import (
 	"strings"
 )
 
-var DTCM_S *dtm.DTCM_S = nil
-var W_DIR string = "."
+var SRV *FFCM_S = nil
 
 func InitDtcmS(fcfg *util.Fcfg, dbc dtm.DB_C, h dtm.DTCM_S_H) error {
 	var err error
-	DTCM_S, err = dtm.StartDTCM_S(fcfg, dbc, h)
+	SRV, err = NewFFCM_S(fcfg, dbc, h)
 	return err
 }
 
@@ -29,7 +28,7 @@ func InitDtcmS(fcfg *util.Fcfg, dbc dtm.DB_C, h dtm.DTCM_S_H) error {
 // }
 
 func RunFFCM_S_V(fcfg *util.Fcfg) error {
-	if DTCM_S == nil {
+	if SRV == nil {
 		return util.Err("server is not running")
 	}
 	var ffprobe_c = fcfg.Val("ffprobe_c")
@@ -38,42 +37,52 @@ func RunFFCM_S_V(fcfg *util.Fcfg) error {
 	}
 	var w_dir = fcfg.Val("w_dir")
 	if len(w_dir) > 0 {
-		W_DIR = w_dir
+		SRV.W_DIR = w_dir
 	}
 	var listen = fcfg.Val("listen")
-	routing.H("^/status(\\?.*)?", DTCM_S)
-	routing.HFunc("^/addTask(\\?.*)?", AddTaskH)
+	SRV.Hand("", routing.Shared)
 	log.D("listen web server on %v", listen)
 	return routing.ListenAndServe(listen)
 }
 
-func AddTask(src string) error {
-	if DTCM_S == nil {
-		panic("server is not running")
-	}
+type FFCM_S struct {
+	S     *dtm.DTCM_S
+	W_DIR string
+}
+
+func NewFFCM_S(fcfg *util.Fcfg, dbc dtm.DB_C, h dtm.DTCM_S_H) (*FFCM_S, error) {
+	dtcm, err := dtm.StartDTCM_S(fcfg, dbc, h)
+	return NewFFCM_Sv(dtcm), err
+}
+
+func NewFFCM_Sv(dtcm *dtm.DTCM_S) *FFCM_S {
+	return &FFCM_S{S: dtcm, W_DIR: "."}
+}
+func (f *FFCM_S) AddTask(src string) error {
+	return f.AddTaskV(src, nil)
+}
+func (f *FFCM_S) AddTaskV(src string, info interface{}) error {
 	var ext = filepath.Ext(src)
 	if len(ext) < 1 {
 		return util.Err("invalid file(%v)", src)
 	}
-	video, err := ParseVideo(filepath.Join(W_DIR, src))
+	video, err := ParseVideo(filepath.Join(f.W_DIR, src))
 	if err != nil {
-		log.D("FFCM parse video by src %v error->", src, err)
+		log.D("FFCM parse video by src(%v) error->%v", src, err)
 		return err
 	}
+	video.Info = info
 	var tw, th, dur = video.Width, video.Height, int64(video.Duration * 1000000)
 	log.D("FFCM add task by src(%v),width(%v),height(%v),duration(%v)", src, tw, th, dur)
-	return DTCM_S.AddTask(video, src, strings.TrimSuffix(src, ext), tw, th, dur)
+	return f.S.AddTask(video, src, strings.TrimSuffix(src, ext), tw, th, dur)
 }
 
-func AddTaskH(hs *routing.HTTPSession) routing.HResult {
-	if DTCM_S == nil {
-		return hs.MsgResE3(1, "srv-err", "servicer is not running")
-	}
+func (f *FFCM_S) AddTaskH(hs *routing.HTTPSession) routing.HResult {
 	var src string = hs.RVal("src")
 	if len(src) < 1 {
 		return hs.MsgResE3(2, "arg-err", "src argument is empty")
 	}
-	var err = AddTask(src)
+	var err = f.AddTask(src)
 	if err == nil {
 		return hs.MsgRes("OK")
 	} else {
@@ -81,4 +90,10 @@ func AddTaskH(hs *routing.HTTPSession) routing.HResult {
 		log.E("%v", err)
 		return hs.MsgResErr2(3, "srv-err", err)
 	}
+}
+
+func (f *FFCM_S) Hand(pre string, mux *routing.SessionMux) {
+	mux.H("^"+pre+"/status(\\?.*)?", f.S)
+	mux.HFunc("^"+pre+"/v/addTask(\\?.*)?", f.AddTaskH)
+	mux.HFunc("^"+pre+"/n/addTask(\\?.*)?", f.S.AddTaskH)
 }

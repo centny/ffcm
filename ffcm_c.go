@@ -9,20 +9,17 @@ import (
 	"strings"
 )
 
-var DTCM_C *dtm.DTM_C
+var CLIENT *FFCM_C
 
 func RunFFCM_C(cfg string) error {
-	if DTCM_C != nil {
-		return util.Err("runner is running")
+	if CLIENT != nil {
+		return util.Err("client is running")
 	}
 	var fcfg = util.NewFcfg3()
 	fcfg.InitWithFilePath2(cfg, true)
 	fcfg.Print()
-	routing.HFunc("^/notify(\\?.*)?$", NofityProc)
-	routing.Shared.Print()
-	routing.Shared.ShowLog = true
-	DTCM_C = dtm.StartDTM_C(fcfg)
-	return DTCM_C.RunProcH()
+	CLIENT = NewFFCM_C(fcfg)
+	return CLIENT.RunProcH()
 }
 
 /*
@@ -50,10 +47,16 @@ type Progress struct {
 	Progress   string  `m2s:"progress" json:"progress"`
 }
 
-func NofityProc(hs *routing.HTTPSession) routing.HResult {
-	if DTCM_C == nil {
-		return hs.Printf("runner is not running")
+type FFCM_C struct {
+	C *dtm.DTM_C
+}
+
+func NewFFCM_C(fcfg *util.Fcfg) *FFCM_C {
+	return &FFCM_C{
+		C: dtm.StartDTM_C(fcfg),
 	}
+}
+func (f *FFCM_C) NofityProc(hs *routing.HTTPSession) routing.HResult {
 	var tid string
 	var duration int64
 	err := hs.ValidCheckVal(`
@@ -87,11 +90,17 @@ func NofityProc(hs *routing.HTTPSession) routing.HResult {
 		if int(rate*1000)%10 == 0 {
 			log.D("NofityProc receive rate(%v%%) to task(%v),duration(%v)", int(rate*100), tid, duration)
 		}
-		err = DTCM_C.NotifyProc(tid, rate)
+		err = f.C.NotifyProc(tid, rate)
 		if err != nil {
 			return hs.Printf("notify procgress to task(%v) error by %v", tid, err)
 		}
 		frame = util.Map{}
 	}
 	return hs.Printf("%v", "DONE")
+}
+func (f *FFCM_C) RunProcH() error {
+	routing.HFunc("^/notify(\\?.*)?$", f.NofityProc)
+	routing.Shared.Print()
+	routing.Shared.ShowLog = true
+	return f.C.RunProcH()
 }
