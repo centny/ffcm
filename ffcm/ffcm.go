@@ -5,6 +5,7 @@ import (
 	"github.com/Centny/ffcm"
 	"github.com/Centny/ffcm/mdb"
 	"github.com/Centny/gwf/netw/dtm"
+	"github.com/Centny/gwf/smartio"
 	"github.com/Centny/gwf/util"
 	"os"
 )
@@ -47,7 +48,6 @@ func main() {
 		if len(ffprobe) > 0 {
 			ffcm.FFPROBE_C = ffprobe
 		}
-		fmt.Println(os.Args[2])
 		video, err := ffcm.ParseVideo(os.Args[2])
 		if err == nil {
 			fmt.Println(video.Width, " ", video.Height, " ", video.Duration)
@@ -60,7 +60,11 @@ func main() {
 		if len(os.Args) > 2 {
 			cfg = os.Args[2]
 		}
-		ffcm.RunFFCM_C(cfg)
+		var fcfg_s = util.NewFcfg3()
+		fcfg_s.InitWithFilePath2(cfg, true)
+		fcfg_s.Print()
+		redirect_l(fcfg_s)
+		ffcm.RunFFCM_Cv(fcfg_s)
 	case "-mem":
 		var cfg = "conf/ffcm_s.properties"
 		if len(os.Args) > 2 {
@@ -68,6 +72,8 @@ func main() {
 		}
 		var fcfg_s = util.NewFcfg3()
 		fcfg_s.InitWithFilePath2(cfg, true)
+		fcfg_s.Print()
+		redirect_l(fcfg_s)
 		var err = ffcm.InitDtcmS(fcfg_s, dtm.MemDbc, dtm.NewDoNoneH())
 		if err != nil {
 			fmt.Println(err)
@@ -81,6 +87,8 @@ func main() {
 		}
 		var fcfg_s = util.NewFcfg3()
 		fcfg_s.InitWithFilePath2(cfg, true)
+		fcfg_s.Print()
+		redirect_l(fcfg_s)
 		var err = ffcm.InitDtcmS(fcfg_s, mdb.MdbH_dc, dtm.NewDoNoneH())
 		if err != nil {
 			fmt.Println(err)
@@ -90,5 +98,16 @@ func main() {
 	default:
 		usage()
 		ef(1)
+	}
+}
+
+func redirect_l(fcfg *util.Fcfg) {
+	var out_l = fcfg.Val2("out_l", "")
+	if len(out_l) > 0 {
+		smartio.RedirectStdout3(out_l)
+	}
+	var err_l = fcfg.Val2("err_l", "")
+	if len(err_l) > 0 {
+		smartio.RedirectStdout3(err_l)
 	}
 }

@@ -12,12 +12,16 @@ import (
 var CLIENT *FFCM_C
 
 func RunFFCM_C(cfg string) error {
-	if CLIENT != nil {
-		return util.Err("client is running")
-	}
 	var fcfg = util.NewFcfg3()
 	fcfg.InitWithFilePath2(cfg, true)
 	fcfg.Print()
+	return RunFFCM_Cv(fcfg)
+}
+
+func RunFFCM_Cv(fcfg *util.Fcfg) error {
+	if CLIENT != nil {
+		return util.Err("client is running")
+	}
 	CLIENT = NewFFCM_C(fcfg)
 	return CLIENT.RunProcH()
 }
