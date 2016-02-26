@@ -175,6 +175,7 @@ func TestMatch(t *testing.T) {
 	fmt.Println(regexp.MustCompile("(?i)^.*\\.(mkv|avi)$").MatchString("abc.aVi"))
 	fmt.Println(regexp.MustCompile("(?i)^.*\\.(mkv|avi)$").MatchString("abc.avix"))
 	fmt.Println(regexp.MustCompile("(?i)^.*\\.(mkv|avi)$").MatchString("abc.mkv"))
+	fmt.Println(regexp.MustCompile("(?i)^.*\\.(doc|docx|xps|rtf)$").MatchString("abc.docx"))
 	fmt.Println(regexp.MustCompile("^.*\\.[(mp4)]$").MatchString("xxx.mp4"))
 }
 

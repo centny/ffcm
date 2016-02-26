@@ -100,7 +100,7 @@ func (f *FFCM_C) NofityProc(hs *routing.HTTPSession) routing.HResult {
 }
 func (f *FFCM_C) RunProcH() error {
 	routing.HFunc("^/notify(\\?.*)?$", f.NofityProc)
-	routing.Shared.Print()
+	// routing.Shared.Print()
 	routing.Shared.ShowLog = true
 	return f.C.RunProcH()
 }
