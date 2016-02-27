@@ -17,6 +17,7 @@ func usage() {
 	ffcm -mem <configure file>					run server on memory store mode by configure file
 	ffcm -s <configure file>					run server on database store mode by configure file.
 	ffcm -i <video file>						print video info
+	ffcm -g <http url>							send http get request
 		`)
 }
 
@@ -95,6 +96,19 @@ func main() {
 			return
 		}
 		ffcm.RunFFCM_S_V(fcfg_s)
+	case "-g":
+		if len(os.Args) < 3 {
+			usage()
+			ef(1)
+			return
+		}
+		var res, err = util.HGet("%v", os.Args[2])
+		if err == nil {
+			fmt.Println(res)
+		} else {
+			fmt.Printf("request to %v error->%v", os.Args[2], err)
+			ef(1)
+		}
 	default:
 		usage()
 		ef(1)
