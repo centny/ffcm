@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Centny/ffcm"
 	"github.com/Centny/ffcm/mdb"
+	"github.com/Centny/gwf/log"
 	"github.com/Centny/gwf/netw/dtm"
 	"github.com/Centny/gwf/smartio"
 	"github.com/Centny/gwf/util"
@@ -117,13 +118,13 @@ func main() {
 
 func redirect_l(fcfg *util.Fcfg) {
 	var out_l = fcfg.Val2("out_l", "")
+	var err_l = fcfg.Val2("err_l", "")
+	fmt.Println("redirect stdout to file(%v) and stderr to file(%v)", out_l, err_l)
 	if len(out_l) > 0 {
-		fmt.Println("redirect stdout to file", out_l)
 		smartio.RedirectStdout3(out_l)
 	}
-	var err_l = fcfg.Val2("err_l", "")
 	if len(err_l) > 0 {
-		fmt.Println("redirect stderr to file", err_l)
 		smartio.RedirectStderr3(err_l)
 	}
+	log.SetWriter(os.Stdout)
 }
