@@ -39,6 +39,7 @@ func RunFFCM_S_V(fcfg *util.Fcfg) error {
 	}
 	var listen = fcfg.Val("listen")
 	routing.H("^/status(\\?.*)?", SRV)
+	routing.HFunc("^/addTask(\\?.*)?", SRV.AddTaskH)
 	routing.Shared.Print()
 	log.D("listen web server on %v", listen)
 	return routing.ListenAndServe(listen)
