@@ -13,6 +13,10 @@ import (
 var SRV *dtm.DTCM_S = nil
 
 func InitDtcmS(fcfg *util.Fcfg, dbc dtm.DB_C, h dtm.DTCM_S_H) error {
+	var ffprobe_c = fcfg.Val("ffprobe_c")
+	if len(ffprobe_c) > 0 {
+		FFPROBE_C = ffprobe_c
+	}
 	var err error
 	SRV, err = dtm.StartDTCM_S(fcfg, dbc, h)
 	return err
@@ -33,13 +37,8 @@ func RunFFCM_S_V(fcfg *util.Fcfg) error {
 	if SRV == nil {
 		return util.Err("server is not running")
 	}
-	var ffprobe_c = fcfg.Val("ffprobe_c")
-	if len(ffprobe_c) > 0 {
-		FFPROBE_C = ffprobe_c
-	}
 	var listen = fcfg.Val("listen")
-	routing.H("^/status(\\?.*)?", SRV)
-	routing.HFunc("^/addTask(\\?.*)?", SRV.AddTaskH)
+	SRV.Hand("", routing.Shared)
 	routing.Shared.Print()
 	log.D("listen web server on %v", listen)
 	return routing.ListenAndServe(listen)
