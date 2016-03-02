@@ -49,6 +49,15 @@ func (d *dtcm_s_h) OnStart(dtcm *dtm.DTCM_S, task *dtm.Task) {
 }
 func (d *dtcm_s_h) OnDone(dtcm *dtm.DTCM_S, task *dtm.Task) error {
 	fmt.Println("OnDone...")
+	for _, proc := range task.Proc {
+		if proc.Res == nil {
+			panic("res is nil")
+		}
+		var res = proc.Res.(util.Map)
+		if len(res) < 1 {
+			panic("res is empty")
+		}
+	}
 	d.cw <- 1
 	return nil
 }
@@ -81,7 +90,7 @@ func TestFFCM(t *testing.T) {
 	go RunFFCM_C("ffcm_c.properties")
 	time.Sleep(1 * time.Second)
 	fmt.Println("xxxx--->a")
-	err = SRV.AddTask("xx.mp4")
+	err = SRV.AddTask("xx.mp4", "xx.mp4")
 	if err != nil {
 		t.Error(err.Error())
 		return
@@ -92,24 +101,19 @@ func TestFFCM(t *testing.T) {
 	<-sh.cw
 	util.Exec("rm", "-f", "xx_*")
 	at_ts := httptest.NewServer(SRV.AddTaskH)
-	res, err := at_ts.G2("/addTask?src=%v", "xx.mp4")
+	res, err := at_ts.G2("/addTask?args=%v,%v", "xx.mp4", "xx_x")
 	if res.IntVal("code") != 0 {
 		t.Error("error")
 		return
 	}
 	<-sh.cw
 	<-sh.cw
-	res, err = at_ts.G2("/addTask?src=%v", "")
-	if res.IntVal("code") == 0 {
+	var vproc = SRV.AbsL[0].(*AbsV)
+	if _, _, _, err = vproc.Build(SRV, "xkkd", nil, "xdds"); err == nil {
 		t.Error("error")
 		return
 	}
-	res, err = at_ts.G2("/addTask?src=%v", "sfsd")
-	if res.IntVal("code") == 0 {
-		t.Error("error")
-		return
-	}
-	ts := httptest.NewServer(CLIENT.NofityProc)
+	ts := httptest.NewServer2(NewVideoProc(CLIENT))
 	ts.PostN("?tid=%v", "text/plain", bytes.NewBufferString(`
 		`), "xxx")
 	ts.PostN("?tid=%v&duration=1111", "text/plain", bytes.NewBufferString(`

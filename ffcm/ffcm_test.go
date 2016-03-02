@@ -1,9 +1,17 @@
 package main
 
 import (
+	"github.com/Centny/gwf/routing/httptest"
 	"os"
 	"testing"
+	"time"
 )
+
+func init() {
+	ef = func(int) {
+
+	}
+}
 
 func TestDim(t *testing.T) {
 	ef = func(int) {
@@ -25,5 +33,66 @@ func TestDim(t *testing.T) {
 	main()
 	//
 	os.Args = []string{"ffcm", "-d", "21x0", "500"}
+	main()
+}
+
+func TestSrv(t *testing.T) {
+	go func() {
+		os.Args = []string{"ffcm", "-s", "./ffcm_s.properties"}
+		main()
+		panic("done...")
+	}()
+	go func() {
+		os.Args = []string{"ffcm", "-mem", "./ffcm_s_t.properties"}
+		main()
+		panic("done...")
+	}()
+	go func() {
+		os.Args = []string{"ffcm", "-c", "./ffcm_c.properties"}
+		main()
+		panic("done...")
+	}()
+	time.Sleep(2 * time.Second)
+	go func() {
+		os.Args = []string{"ffcm", "-s", "./ffcm_s.properties"}
+		main()
+	}()
+	go func() {
+		os.Args = []string{"ffcm", "-mem", "./ffcm_s_t.properties"}
+		main()
+	}()
+	go func() {
+		os.Args = []string{"ffcm", "-c", "./ffcm_c.properties"}
+		main()
+	}()
+	time.Sleep(2 * time.Second)
+}
+
+func TestInfo(t *testing.T) {
+	os.Args = []string{"ffcm", "-i", "../xx.mp4"}
+	main()
+	os.Setenv("FFPROBE_C", "/usr/local/bin/ffprobe")
+	os.Args = []string{"ffcm", "-i", "../xx.mp4"}
+	main()
+	os.Args = []string{"ffcm", "-i", "../sdxx.mp4"}
+	main()
+	os.Args = []string{"ffcm", "-i"}
+	main()
+}
+
+func TestG(t *testing.T) {
+	var ts = httptest.NewMuxServer()
+	os.Args = []string{"ffcm", "-g", "http://127.0.0.1:23243"}
+	main()
+	os.Args = []string{"ffcm", "-g", ts.URL}
+	main()
+	os.Args = []string{"ffcm", "-g"}
+	main()
+}
+
+func TestNormal(t *testing.T) {
+	os.Args = []string{"ffcm"}
+	main()
+	os.Args = []string{"ffcm", "-sdsf"}
 	main()
 }

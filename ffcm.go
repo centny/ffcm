@@ -2,10 +2,15 @@ package ffcm
 
 import (
 	"fmt"
+	"github.com/Centny/gwf/netw/dtm"
 	"github.com/Centny/gwf/util"
 	"regexp"
 	"strings"
 )
+
+func init() {
+	dtm.AddCreator("Video", dtm.FuncCreator(NewAbsV))
+}
 
 var FFPROBE_C = "ffprobe"
 
@@ -15,6 +20,7 @@ type Video struct {
 	Size     int64       `bson:"size" json:"size"`
 	Width    int64       `bson:"width" json:"width"`
 	Height   int64       `bson:"height" json:"height"`
+	Alias    string      `bson:"alias" json:"alias"`
 	Kvs      util.Map    `bson:"-" json:"-"`
 	Info     interface{} `bson:"info" json:"info"`
 }

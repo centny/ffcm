@@ -66,7 +66,8 @@ func main() {
 		fcfg_s.InitWithFilePath2(cfg, true)
 		fcfg_s.Print()
 		redirect_l(fcfg_s)
-		ffcm.RunFFCM_Cv(fcfg_s)
+		err := ffcm.RunFFCM_Cv(fcfg_s)
+		fmt.Println(err)
 	case "-mem":
 		var cfg = "conf/ffcm_s.properties"
 		if len(os.Args) > 2 {
@@ -77,11 +78,10 @@ func main() {
 		fcfg_s.Print()
 		redirect_l(fcfg_s)
 		var err = ffcm.InitDtcmS(fcfg_s, dtm.MemDbc, dtm.NewDoNoneH())
-		if err != nil {
-			fmt.Println(err)
-			return
+		if err == nil {
+			err = ffcm.RunFFCM_S_V(fcfg_s)
 		}
-		ffcm.RunFFCM_S_V(fcfg_s)
+		fmt.Println(err)
 	case "-s":
 		var cfg = "conf/ffcm_s.properties"
 		if len(os.Args) > 2 {
@@ -92,11 +92,10 @@ func main() {
 		fcfg_s.Print()
 		redirect_l(fcfg_s)
 		var err = ffcm.InitDtcmS(fcfg_s, mdb.MdbH_dc, dtm.NewDoNoneH())
-		if err != nil {
-			fmt.Println(err)
-			return
+		if err == nil {
+			err = ffcm.RunFFCM_S_V(fcfg_s)
 		}
-		ffcm.RunFFCM_S_V(fcfg_s)
+		fmt.Println(err)
 	case "-g":
 		if len(os.Args) < 3 {
 			usage()
@@ -107,7 +106,7 @@ func main() {
 		if err == nil {
 			fmt.Println(res)
 		} else {
-			fmt.Printf("request to %v error->%v", os.Args[2], err)
+			fmt.Printf("request to %v error->%v\n", os.Args[2], err)
 			ef(1)
 		}
 	default:

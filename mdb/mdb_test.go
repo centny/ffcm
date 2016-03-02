@@ -12,10 +12,16 @@ func TestMdb(t *testing.T) {
 		t.Error(err.Error())
 		return
 	}
+	dbh.(*MdbH).C().RemoveAll(nil)
 	var task = &dtm.Task{
 		Id: "xxx",
 	}
 	err = dbh.Add(task)
+	if err != nil {
+		t.Error(err.Error())
+		return
+	}
+	_, err = dbh.Find(task.Id)
 	if err != nil {
 		t.Error(err.Error())
 		return
@@ -41,6 +47,11 @@ func TestMdb(t *testing.T) {
 	err = dbh.Del(task)
 	if err != nil {
 		t.Error(err.Error())
+		return
+	}
+	_, err = dbh.Find(task.Id)
+	if err != nil {
+		t.Error("error")
 		return
 	}
 	ts, err = dbh.List()

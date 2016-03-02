@@ -2,6 +2,7 @@ package mdb
 
 import (
 	"github.com/Centny/dbm/mgo"
+	"github.com/Centny/ffcm"
 	"github.com/Centny/gwf/netw/dtm"
 	tmgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -9,11 +10,11 @@ import (
 
 type MdbH struct {
 	Name string
-	Db   *mgo.MDbs
+	MC   func(string) *tmgo.Collection
 }
 
 func (m *MdbH) C() *tmgo.Collection {
-	return m.Db.C(m.Name)
+	return m.MC(m.Name)
 }
 
 //add task to db
@@ -42,21 +43,33 @@ func (m *MdbH) List() ([]*dtm.Task, error) {
 func (m *MdbH) Find(id string) (*dtm.Task, error) {
 	var ts []*dtm.Task
 	var err = m.C().Find(bson.M{"_id": id}).All(&ts)
-	if err != nil {
-		return nil, err
+	var task *dtm.Task
+	if err == nil && len(ts) > 0 {
+		task = ts[0]
 	}
-	if len(ts) < 1 {
-		return nil, nil
-	} else {
-		return ts[0], nil
-	}
+	return task, err
 }
 
 //database creator
 func MdbH_dc(uri, name string) (dtm.DbH, error) {
 	db, err := mgo.NewMDbs(uri, name)
+	if err == nil {
+		return &MdbH{
+			Name: "ffcm_task",
+			MC:   db.C,
+		}, err
+	} else {
+		return nil, err
+	}
+}
+
+func DefaultDbc(uri, name string) (dtm.DbH, error) {
 	return &MdbH{
 		Name: "ffcm_task",
-		Db:   db,
-	}, err
+		MC:   mgo.C,
+	}, nil
+}
+
+func StartTest(cfgs, cfgc string, h dtm.DTCM_S_H) {
+	ffcm.StartTest(cfgs, cfgc, MdbH_dc, h)
 }

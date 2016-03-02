@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-var CLIENT *FFCM_C
+var CLIENT *dtm.DTM_C
 
 func RunFFCM_C(cfg string) error {
 	var fcfg = util.NewFcfg3()
@@ -22,7 +22,8 @@ func RunFFCM_Cv(fcfg *util.Fcfg) error {
 	if CLIENT != nil {
 		return util.Err("client is running")
 	}
-	CLIENT = NewFFCM_C(fcfg)
+	CLIENT = dtm.StartDTM_C(fcfg)
+	CLIENT.AddProcH(NewVideoProc(CLIENT))
 	return CLIENT.RunProcH()
 }
 
@@ -51,16 +52,18 @@ type Progress struct {
 	Progress   string  `m2s:"progress" json:"progress"`
 }
 
-type FFCM_C struct {
-	C *dtm.DTM_C
+type VideoProc struct {
+	*dtm.DTM_C
+	HKey string
 }
 
-func NewFFCM_C(fcfg *util.Fcfg) *FFCM_C {
-	return &FFCM_C{
-		C: dtm.StartDTM_C(fcfg),
-	}
+func NewVideoProc(dtmc *dtm.DTM_C) *VideoProc {
+	return &VideoProc{HKey: "^/notify(\\?.*)?$", DTM_C: dtmc}
 }
-func (f *FFCM_C) NofityProc(hs *routing.HTTPSession) routing.HResult {
+func (v *VideoProc) Key() string {
+	return v.HKey
+}
+func (v *VideoProc) SrvHTTP(hs *routing.HTTPSession) routing.HResult {
 	var tid string
 	var duration int64
 	err := hs.ValidCheckVal(`
@@ -94,17 +97,11 @@ func (f *FFCM_C) NofityProc(hs *routing.HTTPSession) routing.HResult {
 		if int(rate*1000)%10 == 0 {
 			log.D("NofityProc receive rate(%v%%) to task(%v),duration(%v)", int(rate*100), tid, duration)
 		}
-		err = f.C.NotifyProc(tid, rate)
+		err = v.NotifyProc(tid, rate)
 		if err != nil {
 			return hs.Printf("notify procgress to task(%v) error by %v", tid, err)
 		}
 		frame = util.Map{}
 	}
 	return hs.Printf("%v", "DONE")
-}
-func (f *FFCM_C) RunProcH() error {
-	routing.HFunc("^/notify(\\?.*)?$", f.NofityProc)
-	// routing.Shared.Print()
-	routing.Shared.ShowLog = true
-	return f.C.RunProcH()
 }

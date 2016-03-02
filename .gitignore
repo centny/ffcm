@@ -11,3 +11,6 @@ xx.mp4
 
 build
 *.bak
+out
+tmp
+logs
