@@ -66,6 +66,7 @@ func main() {
 		fcfg_s.InitWithFilePath2(cfg, true)
 		fcfg_s.Print()
 		redirect_l(fcfg_s)
+		defer smartio.ResetStd()
 		err := ffcm.RunFFCM_Cv(fcfg_s)
 		fmt.Println(err)
 	case "-mem":
@@ -77,6 +78,7 @@ func main() {
 		fcfg_s.InitWithFilePath2(cfg, true)
 		fcfg_s.Print()
 		redirect_l(fcfg_s)
+		defer smartio.ResetStd()
 		var err = ffcm.InitDtcmS(fcfg_s, dtm.MemDbc, dtm.NewDoNoneH())
 		if err == nil {
 			err = ffcm.RunFFCM_S_V(fcfg_s)
@@ -91,6 +93,7 @@ func main() {
 		fcfg_s.InitWithFilePath2(cfg, true)
 		fcfg_s.Print()
 		redirect_l(fcfg_s)
+		defer smartio.ResetStd()
 		var err = ffcm.InitDtcmS(fcfg_s, mdb.MdbH_dc, dtm.NewDoNoneH())
 		if err == nil {
 			err = ffcm.RunFFCM_S_V(fcfg_s)
