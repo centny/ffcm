@@ -9,6 +9,7 @@ import (
 	"github.com/Centny/gwf/smartio"
 	"github.com/Centny/gwf/util"
 	"os"
+	"time"
 )
 
 func usage() {
@@ -66,9 +67,10 @@ func main() {
 		fcfg_s.InitWithFilePath2(cfg, true)
 		fcfg_s.Print()
 		redirect_l(fcfg_s)
-		defer smartio.ResetStd()
 		err := ffcm.RunFFCM_Cv(fcfg_s)
 		fmt.Println(err)
+		smartio.ResetStd()
+		time.Sleep(time.Second)
 	case "-mem":
 		var cfg = "conf/ffcm_s.properties"
 		if len(os.Args) > 2 {
@@ -78,12 +80,13 @@ func main() {
 		fcfg_s.InitWithFilePath2(cfg, true)
 		fcfg_s.Print()
 		redirect_l(fcfg_s)
-		defer smartio.ResetStd()
 		var err = ffcm.InitDtcmS(fcfg_s, dtm.MemDbc, dtm.NewDoNoneH())
 		if err == nil {
 			err = ffcm.RunFFCM_S_V(fcfg_s)
 		}
 		fmt.Println(err)
+		smartio.ResetStd()
+		time.Sleep(time.Second)
 	case "-s":
 		var cfg = "conf/ffcm_s.properties"
 		if len(os.Args) > 2 {
@@ -93,12 +96,13 @@ func main() {
 		fcfg_s.InitWithFilePath2(cfg, true)
 		fcfg_s.Print()
 		redirect_l(fcfg_s)
-		defer smartio.ResetStd()
 		var err = ffcm.InitDtcmS(fcfg_s, mdb.MdbH_dc, dtm.NewDoNoneH())
 		if err == nil {
 			err = ffcm.RunFFCM_S_V(fcfg_s)
 		}
 		fmt.Println(err)
+		smartio.ResetStd()
+		time.Sleep(time.Second)
 	case "-g":
 		if len(os.Args) < 3 {
 			usage()
