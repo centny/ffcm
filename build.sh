@@ -10,7 +10,7 @@ echo "Installing Dependence"
 if [ "$1" = "-u" ];then
  twd=`pwd`
  echo "Running Clear"
- cd  $GOPATH/src/github.com/Centny/gwf/
+ cd  $GOPATH/src/github.com/Centny/ffcm/
  git pull
  cd $twd
 fi
