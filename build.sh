@@ -7,9 +7,13 @@ export PATH=$PATH:$GOPATH/bin:$HOME/bin:$GOROOT/bin
 ##############################
 ######Install Dependence######
 echo "Installing Dependence"
-#go get github.com/go-sql-driver/mysql
-#go get github.com/Centny/TDb
-#go get code.google.com/p/go-uuid/uuid
+if [ "$1" = "-u" ];then
+ twd=`pwd`
+ echo "Running Clear"
+ cd  $GOPATH/src/github.com/Centny/gwf/
+ git pull
+ cd $twd
+fi
 ##############################
 #########Running Clear#########
 #########Running Test#########
