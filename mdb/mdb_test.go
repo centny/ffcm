@@ -2,8 +2,10 @@ package mdb
 
 import (
 	"fmt"
+	"github.com/Centny/dbm/mgo"
 	"github.com/Centny/gwf/netw/dtm"
 	"testing"
+	"time"
 )
 
 func TestMdb(t *testing.T) {
@@ -63,5 +65,19 @@ func TestMdb(t *testing.T) {
 		t.Error("error")
 		return
 	}
+	//
+	_, err = MdbH_dc("127.0.0.1:23442", "sdfs")
+	if err == nil {
+		t.Error("error")
+		return
+	}
+	//
+	DefaultDbc("uri", "name")
+	//
+	mgo.AddDefault("cny:123@loc.w:27017/cny", "cny")
+	StartTest("../ffcm_s.properties", "../ffcm_c.properties", dtm.NewDoNoneH())
+	//
+	time.Sleep(time.Second)
+	//
 	fmt.Println("done...")
 }

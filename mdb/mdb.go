@@ -71,5 +71,5 @@ func DefaultDbc(uri, name string) (dtm.DbH, error) {
 }
 
 func StartTest(cfgs, cfgc string, h dtm.DTCM_S_H) {
-	ffcm.StartTest(cfgs, cfgc, MdbH_dc, h)
+	ffcm.StartTest(cfgs, cfgc, DefaultDbc, h)
 }

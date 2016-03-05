@@ -142,7 +142,10 @@ func TestFFCM(t *testing.T) {
 		t.Error("error")
 		return
 	}
+	CLIENT.Stop()
+	SRV.Close()
 	SRV = nil
+	CLIENT = nil
 	RunFFCM_S_V(nil)
 	//
 	//
