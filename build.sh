@@ -18,14 +18,14 @@ fi
 #########Running Clear#########
 #########Running Test#########
 echo "Running Test"
-pkgs="\
- github.com/Centny/ffcm/ffcm\
-"
 # pkgs="\
 #  github.com/Centny/ffcm/ffcm\
-#  github.com/Centny/ffcm\
-#  github.com/Centny/ffcm/mdb\
 # "
+pkgs="\
+ github.com/Centny/ffcm/ffcm\
+ github.com/Centny/ffcm\
+ github.com/Centny/ffcm/mdb\
+"
 echo "mode: set" > a.out
 for p in $pkgs;
 do
