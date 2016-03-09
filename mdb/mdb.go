@@ -33,15 +33,24 @@ func (m *MdbH) Del(t *dtm.Task) error {
 }
 
 //list task from db
-func (m *MdbH) List(status string) ([]*dtm.Task, error) {
+func (m *MdbH) List(running []string, status string, skip, limit int) (int, []*dtm.Task, error) {
 	var ts []*dtm.Task
 	var err error
-	if len(status) > 0 {
-		err = m.C().Find(bson.M{"status": status}).All(&ts)
-	} else {
-		err = m.C().Find(nil).All(&ts)
+	var sel = bson.M{}
+	if len(running) > 0 {
+		sel["_id"] = bson.M{
+			"$nin": running,
+		}
 	}
-	return ts, err
+	if len(status) > 0 {
+		sel["status"] = status
+	}
+	err = m.C().Find(sel).Skip(skip).Limit(limit).All(&ts)
+	var total int = 0
+	if err == nil {
+		total, err = m.C().Count()
+	}
+	return total, ts, err
 }
 
 //find task by id
