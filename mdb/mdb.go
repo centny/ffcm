@@ -33,9 +33,14 @@ func (m *MdbH) Del(t *dtm.Task) error {
 }
 
 //list task from db
-func (m *MdbH) List() ([]*dtm.Task, error) {
+func (m *MdbH) List(status string) ([]*dtm.Task, error) {
 	var ts []*dtm.Task
-	var err = m.C().Find(nil).All(&ts)
+	var err error
+	if len(status) > 0 {
+		err = m.C().Find(bson.M{"status": status}).All(&ts)
+	} else {
+		err = m.C().Find(nil).All(&ts)
+	}
 	return ts, err
 }
 

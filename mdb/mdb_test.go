@@ -33,7 +33,7 @@ func TestMdb(t *testing.T) {
 		t.Error(err.Error())
 		return
 	}
-	ts, err := dbh.List()
+	ts, err := dbh.List("")
 	if err != nil {
 		t.Error(err.Error())
 		return
@@ -56,7 +56,7 @@ func TestMdb(t *testing.T) {
 		t.Error("error")
 		return
 	}
-	ts, err = dbh.List()
+	ts, err = dbh.List("")
 	if err != nil {
 		t.Error(err.Error())
 		return
