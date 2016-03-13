@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "io.vty.cswf.ffcm", "io.vty.cswf.ffcm\io.vty.cswf.ffcm.csproj", "{7EFB50C5-011C-4444-8BE6-C09155C68995}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "io.vty.cswf", "..\cswf\io.vty.cswf\io.vty.cswf.csproj", "{074D7A3B-ADAE-434A-AF73-BB8263965303}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "io.vty.cswf.ffcm.console", "io.vty.cswf.ffcm.console\io.vty.cswf.ffcm.console.csproj", "{5227F298-5DE6-4C6B-9273-E0CCD6338A45}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "io.vty.cswf.ffcm.test", "io.vty.cswf.ffcm.test\io.vty.cswf.ffcm.test.csproj", "{C5447864-548A-42EF-AFF1-90BAC6AB2F9D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "log4net.vs2010", "..\log4net\src\log4net.vs2010.csproj", "{181FE707-E161-4722-9F38-6AAAB6FAA106}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7EFB50C5-011C-4444-8BE6-C09155C68995}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EFB50C5-011C-4444-8BE6-C09155C68995}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EFB50C5-011C-4444-8BE6-C09155C68995}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EFB50C5-011C-4444-8BE6-C09155C68995}.Release|Any CPU.Build.0 = Release|Any CPU
+		{074D7A3B-ADAE-434A-AF73-BB8263965303}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{074D7A3B-ADAE-434A-AF73-BB8263965303}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{074D7A3B-ADAE-434A-AF73-BB8263965303}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{074D7A3B-ADAE-434A-AF73-BB8263965303}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5227F298-5DE6-4C6B-9273-E0CCD6338A45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5227F298-5DE6-4C6B-9273-E0CCD6338A45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5227F298-5DE6-4C6B-9273-E0CCD6338A45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5227F298-5DE6-4C6B-9273-E0CCD6338A45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5447864-548A-42EF-AFF1-90BAC6AB2F9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5447864-548A-42EF-AFF1-90BAC6AB2F9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5447864-548A-42EF-AFF1-90BAC6AB2F9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5447864-548A-42EF-AFF1-90BAC6AB2F9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{181FE707-E161-4722-9F38-6AAAB6FAA106}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{181FE707-E161-4722-9F38-6AAAB6FAA106}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{181FE707-E161-4722-9F38-6AAAB6FAA106}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{181FE707-E161-4722-9F38-6AAAB6FAA106}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
