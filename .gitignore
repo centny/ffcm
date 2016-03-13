@@ -12,3 +12,6 @@ build
 out
 tmp
 logs
+.vs
+bin
+obj
