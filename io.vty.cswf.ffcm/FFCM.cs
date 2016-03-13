@@ -19,10 +19,12 @@ namespace io.vty.cswf.ffcm
         public FFCM(string name, FCfg cfg) : base(name, cfg)
         {
             this.Srv.AddH("^/notify(\\?.*)?", this.OnFfProc);
+            this.Token = cfg.Val("token", "");
         }
         public FFCM(string name, FCfg cfg, NetwRunnerV.NetwBaseBuilder builder) : base(name, cfg, builder)
         {
             this.Srv.AddH("^/notify(\\?.*)?", this.OnFfProc);
+            this.Token = cfg.Val("token", "");
         }
         public override void onCon(NetwRunnable nr, Netw w)
         {
