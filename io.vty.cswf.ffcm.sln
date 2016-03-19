@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "io.vty.cswf.ffcm", "io.vty.cswf.ffcm\io.vty.cswf.ffcm.csproj", "{7EFB50C5-011C-4444-8BE6-C09155C68995}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "io.vty.cswf.ffcm.test", "io.vty.cswf.ffcm.test\io.vty.cswf.ffcm.test.csproj", "{C5447864-548A-42EF-AFF1-90BAC6AB2F9D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "log4net.vs2010", "..\log4net\src\log4net.vs2010.csproj", "{181FE707-E161-4722-9F38-6AAAB6FAA106}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "io.vty.cswf.doc", "..\cswf.doc\io.vty.cswf.doc\io.vty.cswf.doc.csproj", "{E9B1E886-FDD3-47AF-A2BE-4F1C681BA4FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{181FE707-E161-4722-9F38-6AAAB6FAA106}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{181FE707-E161-4722-9F38-6AAAB6FAA106}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{181FE707-E161-4722-9F38-6AAAB6FAA106}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9B1E886-FDD3-47AF-A2BE-4F1C681BA4FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9B1E886-FDD3-47AF-A2BE-4F1C681BA4FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9B1E886-FDD3-47AF-A2BE-4F1C681BA4FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9B1E886-FDD3-47AF-A2BE-4F1C681BA4FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

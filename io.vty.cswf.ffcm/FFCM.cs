@@ -13,24 +13,17 @@ using io.vty.cswf.netw.r;
 
 namespace io.vty.cswf.ffcm
 {
-    public class FFCM : DTM_C_j
+    public class FFCM
     {
+        public DTM_C DTMC { get; protected set; }
+        public Server Srv { get; protected set; }
+        public FFCM(DTM_C dtmc, Server srv)
+        {
+            this.DTMC = dtmc;
+            this.Srv = srv;
+            this.Srv.AddH("^/notify(\\?.*)?", this.OnFfProc);
+        }
 
-        public FFCM(string name, FCfg cfg) : base(name, cfg)
-        {
-            this.Srv.AddH("^/notify(\\?.*)?", this.OnFfProc);
-            this.Token = cfg.Val("token", "");
-        }
-        public FFCM(string name, FCfg cfg, NetwRunnerV.NetwBaseBuilder builder) : base(name, cfg, builder)
-        {
-            this.Srv.AddH("^/notify(\\?.*)?", this.OnFfProc);
-            this.Token = cfg.Val("token", "");
-        }
-        public override void onCon(NetwRunnable nr, Netw w)
-        {
-            base.onCon(nr, w);
-            this.CallLogin();
-        }
         public virtual HResult OnFfProc(Request r)
         {
             var args = HttpUtility.ParseQueryString(r.req.Url.Query);
@@ -74,7 +67,7 @@ namespace io.vty.cswf.ffcm
                     continue;
                 }
                 var ms = frame.Val<float>("out_time_ms", 0);
-                this.NotifyProc(tid, ms / duration);
+                this.DTMC.NotifyProc(tid, ms / duration);
             }
             r.res.StatusCode = 200;
             r.WriteLine("OK");

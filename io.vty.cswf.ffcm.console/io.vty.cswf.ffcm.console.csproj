@@ -50,6 +50,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\cswf.doc\io.vty.cswf.doc\io.vty.cswf.doc.csproj">
+      <Project>{e9b1e886-fdd3-47af-a2be-4f1c681ba4fe}</Project>
+      <Name>io.vty.cswf.doc</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\cswf\io.vty.cswf\io.vty.cswf.csproj">
       <Project>{074d7a3b-adae-434a-af73-bb8263965303}</Project>
       <Name>io.vty.cswf</Name>

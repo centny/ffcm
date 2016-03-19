@@ -1,4 +1,6 @@
-﻿using io.vty.cswf.log;
+﻿using io.vty.cswf.doc;
+using io.vty.cswf.log;
+using io.vty.cswf.netw.dtm;
 using io.vty.cswf.netw.sck;
 using io.vty.cswf.util;
 using System;
@@ -12,6 +14,7 @@ namespace io.vty.cswf.ffcm.console
 {
     class Program
     {
+        private static readonly ILog L = Log.New();
         static void Main(string[] args)
         {
             var conf = "conf/ffcm_c.properties";
@@ -21,7 +24,7 @@ namespace io.vty.cswf.ffcm.console
             }
             var cfg = new FCfg();
             cfg.Load(conf, true);
-            Console.WriteLine(cfg);
+            cfg.Print();
             var addr = cfg.Val("srv_addr", "");
             if (addr.Length < 1)
             {
@@ -29,9 +32,11 @@ namespace io.vty.cswf.ffcm.console
                 Environment.Exit(1);
                 return;
             }
-            ILog L = Log.New();
             L.I("starting ffcm...");
-            var ffcm = new FFCM("FFCM", cfg, new SckDailer(addr).Dail);
+            var ffcm = new DocCov("FFCM", cfg, new SckDailer(addr).Dail);
+            var ffcmh = new FFCM(ffcm, ffcm.Srv);
+            ffcm.InitConfig();
+            ffcm.StartMonitor();
             ffcm.Start();
             ffcm.StartProcSrv();
             ffcm.Wait();
