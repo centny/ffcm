@@ -2,9 +2,9 @@
 del /Q /S build
 mkdir build
 mkdir build\cswf.ffcm
-msbuild io.vty.cswf.ffcm.sln /property:Configuration="Release" /t:clean /t:build
-xcopy io.vty.cswf.ffcm.console\bin\Release\cswf-ffcm.exe*  build\cswf.ffcm
-xcopy io.vty.cswf.ffcm.console\bin\Release\*.dll build\cswf.ffcm
+msbuild io.vty.cswf.ffcm.sln /p:Configuration="Release" /p:Platform="x64" /t:clean /t:build
+xcopy io.vty.cswf.ffcm.console\bin\x64\Release\cswf-ffcm.exe*  build\cswf.ffcm
+xcopy io.vty.cswf.ffcm.console\bin\x64\Release\*.dll build\cswf.ffcm
 go build -o build\cswf.ffcm\ffcm.exe github.com/Centny/ffcm/ffcm
 xcopy *.properties build\cswf.ffcm
 xcopy *.sh build\cswf.ffcm
