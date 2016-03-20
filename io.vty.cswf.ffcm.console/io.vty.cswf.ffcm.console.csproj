@@ -53,6 +53,10 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\log4net-bin\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -77,10 +81,6 @@
     <ProjectReference Include="..\..\cswf\io.vty.cswf\io.vty.cswf.csproj">
       <Project>{074d7a3b-adae-434a-af73-bb8263965303}</Project>
       <Name>io.vty.cswf</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\log4net\src\log4net.vs2010.csproj">
-      <Project>{181fe707-e161-4722-9f38-6aaab6faa106}</Project>
-      <Name>log4net.vs2010</Name>
     </ProjectReference>
     <ProjectReference Include="..\io.vty.cswf.ffcm\io.vty.cswf.ffcm.csproj">
       <Project>{7efb50c5-011c-4444-8be6-c09155c68995}</Project>
