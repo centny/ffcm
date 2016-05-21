@@ -9,6 +9,8 @@ import (
 	"github.com/Centny/gwf/smartio"
 	"github.com/Centny/gwf/util"
 	"os"
+	"os/exec"
+	"path/filepath"
 	"time"
 )
 
@@ -20,6 +22,7 @@ func usage() {
 	ffcm -s <configure file>					run server on database store mode by configure file.
 	ffcm -i <video file>						print video info
 	ffcm -g <http url>							send http get request
+	ffcm -c <process url> <input> <width> <height> <max_width> <max_height> <tmp> <out> <result> 
 		`)
 }
 
@@ -37,6 +40,18 @@ func main() {
 		if err == nil {
 			fmt.Println(res)
 		} else {
+			fmt.Println(err)
+			ef(1)
+			return
+		}
+	case "-cov":
+		if len(os.Args) < 11 {
+			usage()
+			ef(1)
+			return
+		}
+		err := do_cov(os.Args[2:])
+		if err != nil {
 			fmt.Println(err)
 			ef(1)
 			return
@@ -133,4 +148,55 @@ func redirect_l(fcfg *util.Fcfg) {
 		smartio.RedirectStderr3(err_l)
 	}
 	log.SetWriter(os.Stdout)
+}
+
+func do_cov(args []string) error {
+	fmt.Printf("run_ff arguments list:\n"+
+		"	%v\n	%v\n	%v\n	%v\n	%v\n	%v\n	%v\n	%v\n	%v\n",
+		args[0], args[1], args[2],
+		args[3], args[4], args[5],
+		args[6], args[7], args[8])
+	err := os.MkdirAll(filepath.Dir(args[6]), os.ModePerm)
+	if os.IsNotExist(err) {
+		return err
+	}
+	err = os.MkdirAll(filepath.Dir(args[7]), os.ModePerm)
+	if os.IsNotExist(err) {
+		return err
+	}
+	res, err := ffcm.Dim2(args[2:6])
+	if err != nil {
+		return err
+	}
+	exe := exec.Command("ffmpeg", "-progress", args[0], "-i", args[1], "-s", res, "-y", args[6])
+	exe.Stderr = os.Stderr
+	exe.Stdout = os.Stdout
+	err = exe.Run()
+	if err != nil {
+		return err
+	}
+	src, err := os.OpenFile(args[6], os.O_RDONLY, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("do copy %v to %v...\n", args[6], args[7])
+	_, err = util.Copyp(args[7], src)
+	if err != nil {
+		src.Close()
+		return err
+	}
+	src.Close()
+	fmt.Printf("do clear tmp file %v...\n", args[6])
+	err = os.Remove(args[6])
+	if err != nil {
+		fmt.Printf("[Warning]remove tmp file %v fail", args[6])
+	}
+	fmt.Printf(`
+----------------result----------------
+[text]
+%v
+[/text]
+	
+	`, args[8])
+	return nil
 }

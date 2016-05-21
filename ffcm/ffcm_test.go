@@ -1,7 +1,9 @@
 package main
 
 import (
+	"github.com/Centny/gwf/routing"
 	"github.com/Centny/gwf/routing/httptest"
+	"io/ioutil"
 	"os"
 	"testing"
 	"time"
@@ -94,5 +96,16 @@ func TestNormal(t *testing.T) {
 	os.Args = []string{"ffcm"}
 	main()
 	os.Args = []string{"ffcm", "-sdsf"}
+	main()
+}
+
+func TestCov(t *testing.T) {
+	os.Setenv("PATH", "/usr/local/bin:"+os.Getenv("PATH"))
+	var ts = httptest.NewMuxServer()
+	ts.Mux.HFunc("^.*$", func(hs *routing.HTTPSession) routing.HResult {
+		ioutil.ReadAll(hs.R.Body)
+		return routing.HRES_RETURN
+	})
+	os.Args = []string{"ffmpeg", "-cov", ts.URL, "../xx.mp4", "1280", "720", "1024", "768", "tmp/abc.mp4", "out/abc.mp4", "abc.mp4"}
 	main()
 }
