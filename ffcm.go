@@ -106,6 +106,12 @@ func Dim(whs []string) ([]string, error) {
 		th = ivs[3]
 		tw = int(float64(ivs[0]) / float64(ivs[1]) * float64(th))
 	}
+	if (tw % 2) > 0 {
+		tw += 1
+	}
+	if (th % 2) > 0 {
+		th += 1
+	}
 	return []string{fmt.Sprintf("%v", tw), fmt.Sprintf("%v", th)}, nil
 }
 
