@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using io.vty.cswf.netw.r;
+using io.vty.cswf.doc;
 
 namespace io.vty.cswf.ffcm
 {
@@ -22,6 +23,23 @@ namespace io.vty.cswf.ffcm
             this.DTMC = dtmc;
             this.Srv = srv;
             this.Srv.AddH("^/notify(\\?.*)?", this.OnFfProc);
+            this.Srv.AddH("^/status(\\?.*)?", this.OnStatus);
+        }
+
+        public virtual HResult OnStatus(Request r)
+        {
+            r.res.StatusCode = 200;
+            r.res.ContentEncoding = Encoding.UTF8;
+            r.res.ContentType = "application/json";
+            var data = new Dict();
+            var tasks = new Dict();
+            tasks.Add("queued", TaskPool.Shared.Queued.Count);
+            tasks.Add("running", TaskPool.Shared.Running.Count);
+            data.Add("tasks", tasks.data);
+            data.Add("word_c", WordCov.Cached.Count);
+            r.WriteLine(Json.stringify(data.data));
+            r.Flush();
+            return HResult.HRES_RETURN;
         }
 
         public virtual HResult OnFfProc(Request r)
@@ -71,6 +89,7 @@ namespace io.vty.cswf.ffcm
             }
             r.res.StatusCode = 200;
             r.WriteLine("OK");
+            r.Flush();
             return HResult.HRES_RETURN;
         }
     }
