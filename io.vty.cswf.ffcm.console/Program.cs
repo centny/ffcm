@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 [assembly: log4net.Config.XmlConfigurator(Watch = true)]
@@ -39,7 +40,26 @@ namespace io.vty.cswf.ffcm.console
             ffcm.StartMonitor();
             ffcm.Start();
             ffcm.StartProcSrv();
+            ThreadPool.QueueUserWorkItem(run_hb, ffcm);
             ffcm.Wait();
+        }
+        static void run_hb(object s)
+        {
+            var ffcm = (DocCov)s;
+            while (true)
+            {
+                try
+                {
+                    L.D("DocCov start hb test...");
+                    ffcm.hb("DocCov");
+                    L.D("DocCov do hb success");
+                }
+                catch (Exception e)
+                {
+                    L.W("{0}", e.Message);
+                }
+                Thread.Sleep(16000);
+            }
         }
     }
 }
