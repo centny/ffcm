@@ -50,9 +50,13 @@ namespace io.vty.cswf.ffcm.console
             {
                 try
                 {
-                    L.D("DocCov start hb test...");
+                    var time = Util.Now();
                     ffcm.hb("DocCov");
-                    L.D("DocCov do hb success");
+                    time = Util.Now() - time;
+                    if (time > 1000)
+                    {
+                        L.W("DocCov do hb success, {0}ms used", time);
+                    }
                 }
                 catch (Exception e)
                 {
