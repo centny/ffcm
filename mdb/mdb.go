@@ -3,7 +3,9 @@ package mdb
 import (
 	"github.com/Centny/dbm/mgo"
 	"github.com/Centny/ffcm"
+	"github.com/Centny/gwf/log"
 	"github.com/Centny/gwf/netw/dtm"
+	"github.com/Centny/gwf/util"
 	tmgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -19,24 +21,32 @@ func (m *MdbH) C() *tmgo.Collection {
 
 //add task to db
 func (m *MdbH) Add(t *dtm.Task) error {
+	log.D("MdbH add task by id(%v)", t.Id)
+	t.Time = util.Now()
 	return m.C().Insert(t)
 }
 
 //update task to db
 func (m *MdbH) Update(t *dtm.Task) error {
+	t.Time = util.Now()
 	return m.C().Update(bson.M{"_id": t.Id}, t)
 }
 
 //delete task to db
 func (m *MdbH) Del(t *dtm.Task) error {
+	log.D("MdbH delete task by id(%v)", t.Id)
 	return m.C().RemoveId(t.Id)
 }
 
 //list task from db
 func (m *MdbH) List(running []string, status string, skip, limit int) (int, []*dtm.Task, error) {
 	var ts []*dtm.Task
-	var err error
-	var sel = bson.M{}
+	var sel = bson.M{
+		"mid": "",
+		"next": bson.M{
+			"$lt": util.Now(),
+		},
+	}
 	if len(running) > 0 {
 		sel["_id"] = bson.M{
 			"$nin": running,
@@ -45,7 +55,14 @@ func (m *MdbH) List(running []string, status string, skip, limit int) (int, []*d
 	if len(status) > 0 {
 		sel["status"] = status
 	}
-	err = m.C().Find(sel).Skip(skip).Limit(limit).All(&ts)
+	_, err := m.C().Find(sel).Sort("time", "runc").Skip(skip).Limit(limit).Apply(tmgo.Change{
+		Update: bson.M{
+			"$set": bson.M{
+				"mid": util.MID(),
+			},
+		},
+		ReturnNew: true,
+	}, &ts)
 	var total int = 0
 	if err == nil {
 		total, err = m.C().Count()
