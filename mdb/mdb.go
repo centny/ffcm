@@ -38,6 +38,11 @@ func (m *MdbH) Del(t *dtm.Task) error {
 	return m.C().RemoveId(t.Id)
 }
 
+func (m *MdbH) ClearSyncTask() error {
+	_, err := m.C().UpdateAll(bson.M{"mid": util.MID()}, bson.M{"$set": bson.M{"mid": ""}})
+	return err
+}
+
 //list task from db
 func (m *MdbH) List(running []string, status string, skip, limit int) (int, []*dtm.Task, error) {
 	var and = []bson.M{}
