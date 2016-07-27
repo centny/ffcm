@@ -9,7 +9,8 @@ import (
 )
 
 func TestMdb(t *testing.T) {
-	dbh, err := MdbH_dc("cny:123@loc.w:27017/cny", "cny")
+	mgo.AddDefault2("cny:123@loc.w:27017/cny")
+	dbh, err := DefaultDbc("", "")
 	if err != nil {
 		t.Error(err.Error())
 		return
@@ -33,11 +34,12 @@ func TestMdb(t *testing.T) {
 		t.Error(err.Error())
 		return
 	}
-	ts, err := dbh.List("")
+	_, ts, err := dbh.List(nil, "", 0, 30)
 	if err != nil {
 		t.Error(err.Error())
 		return
 	}
+	fmt.Println(ts)
 	if len(ts) != 1 {
 		t.Error("error")
 		return
@@ -56,7 +58,7 @@ func TestMdb(t *testing.T) {
 		t.Error("error")
 		return
 	}
-	ts, err = dbh.List("")
+	_, ts, err = dbh.List(nil, "", 0, 30)
 	if err != nil {
 		t.Error(err.Error())
 		return

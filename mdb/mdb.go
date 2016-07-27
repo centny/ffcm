@@ -40,29 +40,66 @@ func (m *MdbH) Del(t *dtm.Task) error {
 
 //list task from db
 func (m *MdbH) List(running []string, status string, skip, limit int) (int, []*dtm.Task, error) {
-	var ts []*dtm.Task
-	var sel = bson.M{
-		"mid": "",
-		"next": bson.M{
-			"$lt": util.Now(),
+	var and = []bson.M{}
+	and = append(and, bson.M{
+		"$or": []bson.M{
+			bson.M{"mid": ""},
+			bson.M{"mid": bson.M{"$exists": false}},
 		},
-	}
+	})
+	and = append(and, bson.M{
+		"$or": []bson.M{
+			bson.M{
+				"next": bson.M{
+					"$lt": util.Now(),
+				},
+			},
+			bson.M{"next": bson.M{"$exists": false}},
+		},
+	})
 	if len(running) > 0 {
-		sel["_id"] = bson.M{
-			"$nin": running,
-		}
+		and = append(and, bson.M{
+			"_id": bson.M{
+				"$nin": running,
+			},
+		})
 	}
 	if len(status) > 0 {
-		sel["status"] = status
+		and = append(and, bson.M{
+			"status": status,
+		})
 	}
-	_, err := m.C().Find(sel).Sort("time", "runc").Skip(skip).Limit(limit).Apply(tmgo.Change{
-		Update: bson.M{
-			"$set": bson.M{
-				"mid": util.MID(),
+	var ts []*dtm.Task
+	var err = m.C().Find(bson.M{"$and": and}).Skip(skip).Limit(limit).All(&ts)
+	if err != nil {
+		return 0, nil, err
+	}
+	var mid = util.MID()
+	var rts []*dtm.Task
+	for _, t := range ts {
+		_, err = m.C().Find(bson.M{
+			"$and": []bson.M{
+				bson.M{"_id": t.Id},
+				bson.M{"$or": []bson.M{
+					bson.M{"mid": ""},
+					bson.M{"mid": bson.M{"$exists": false}},
+				}},
 			},
-		},
-		ReturnNew: true,
-	}, &ts)
+		}).Apply(tmgo.Change{
+			Update: bson.M{
+				"$set": bson.M{
+					"mid": mid,
+				},
+			},
+		}, nil)
+		if err == nil {
+			rts = append(rts, t)
+		} else if err == tmgo.ErrNotFound {
+			continue
+		} else {
+			return 0, nil, err
+		}
+	}
 	var total int = 0
 	if err == nil {
 		total, err = m.C().Count()
