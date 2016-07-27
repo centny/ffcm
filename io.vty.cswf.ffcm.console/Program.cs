@@ -34,13 +34,39 @@ namespace io.vty.cswf.ffcm.console
                 return;
             }
             L.I("starting ffcm...");
+
+            //Samba.
             var ffcm = new DocCov("FFCM", cfg, new SckDailer(addr).Dail);
             var ffcmh = new FFCM(ffcm, ffcm.Srv);
             ffcm.InitConfig();
             ffcm.StartMonitor();
             ffcm.Start();
             ffcm.StartProcSrv();
-            ThreadPool.QueueUserWorkItem(run_hb, ffcm);
+            if (cfg.Val("samba", "N") == "Y")
+            {
+                var samba = Samba.AddVolume2(cfg.Val("samba_vol", ""), cfg.Val("samba_uri", ""),
+                    cfg.Val("samba_user", ""), cfg.Val("samba_pwd", ""),
+                    cfg.Val("samba_paths", ""));
+                samba.Fail = (s,e) =>
+                {
+                    ffcm.ChangeStatus(DTM_C.DCS_UNACTIVATED);
+                };
+                samba.Success = (s) =>
+                {
+                    ffcm.ChangeStatus(DTM_C.DCS_ACTIVATED);
+                };
+                new Thread(run_samba).Start();
+            }
+            var reboot = cfg.Val("reboot", "");
+            if (reboot.Length > 0)
+            {
+                ProcKiller.Shared.OnHavingNotKill = (c) =>
+                {
+                    string output;
+                    Exec.exec(out output, reboot);
+                };
+            }
+            new Thread(run_hb).Start(ffcm);
             ffcm.Wait();
         }
         static void run_hb(object s)
@@ -64,6 +90,10 @@ namespace io.vty.cswf.ffcm.console
                 }
                 Thread.Sleep(16000);
             }
+        }
+        static void run_samba(object s)
+        {
+            Samba.LoopChecker();
         }
     }
 }
