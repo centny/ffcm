@@ -44,7 +44,20 @@ func (m *MdbH) ClearSyncTask() error {
 }
 
 //list task from db
-func (m *MdbH) List(running []string, status string, skip, limit int) (int, []*dtm.Task, error) {
+func (m *MdbH) List(mid string, running []string, status string, skip, limit int) (int, []*dtm.Task, error) {
+	if len(mid) > 0 {
+		_, err := m.C().UpdateAll(
+			bson.M{
+				"mid": mid,
+				"_id": bson.M{"$nin": running},
+			},
+			bson.M{
+				"$set": bson.M{"mid": ""},
+			})
+		if err != nil {
+			return 0, nil, err
+		}
+	}
 	var and = []bson.M{}
 	and = append(and, bson.M{
 		"$or": []bson.M{
@@ -79,37 +92,40 @@ func (m *MdbH) List(running []string, status string, skip, limit int) (int, []*d
 	if err != nil {
 		return 0, nil, err
 	}
-	var mid = util.MID()
 	var rts []*dtm.Task
-	for _, t := range ts {
-		_, err = m.C().Find(bson.M{
-			"$and": []bson.M{
-				bson.M{"_id": t.Id},
-				bson.M{"$or": []bson.M{
-					bson.M{"mid": ""},
-					bson.M{"mid": bson.M{"$exists": false}},
-				}},
-			},
-		}).Apply(tmgo.Change{
-			Update: bson.M{
-				"$set": bson.M{
-					"mid": mid,
+	if len(mid) > 0 {
+		for _, t := range ts {
+			_, err = m.C().Find(bson.M{
+				"$and": []bson.M{
+					bson.M{"_id": t.Id},
+					bson.M{"$or": []bson.M{
+						bson.M{"mid": ""},
+						bson.M{"mid": bson.M{"$exists": false}},
+					}},
 				},
-			},
-		}, nil)
-		if err == nil {
-			rts = append(rts, t)
-		} else if err == tmgo.ErrNotFound {
-			continue
-		} else {
-			return 0, nil, err
+			}).Apply(tmgo.Change{
+				Update: bson.M{
+					"$set": bson.M{
+						"mid": mid,
+					},
+				},
+			}, nil)
+			if err == nil {
+				rts = append(rts, t)
+			} else if err == tmgo.ErrNotFound {
+				continue
+			} else {
+				return 0, nil, err
+			}
 		}
+	} else {
+		rts = ts
 	}
 	var total int = 0
 	if err == nil {
 		total, err = m.C().Count()
 	}
-	return total, ts, err
+	return total, rts, err
 }
 
 //find task by id
