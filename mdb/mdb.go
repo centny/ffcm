@@ -133,8 +133,12 @@ func (m *MdbH) Find(id string) (*dtm.Task, error) {
 	var ts []*dtm.Task
 	var err = m.C().Find(bson.M{"_id": id}).All(&ts)
 	var task *dtm.Task
-	if err == nil && len(ts) > 0 {
-		task = ts[0]
+	if err == nil {
+		if len(ts) > 0 {
+			task = ts[0]
+		} else {
+			err = util.NOT_FOUND
+		}
 	}
 	return task, err
 }
