@@ -44,6 +44,7 @@ namespace io.vty.cswf.ffcm.console
             ffcm.StartProcSrv();
             if (cfg.Val("samba", "N") == "Y")
             {
+                L.I("start initial samba...");
                 var samba = Samba.AddVolume2(cfg.Val("samba_vol", ""), cfg.Val("samba_uri", ""),
                     cfg.Val("samba_user", ""), cfg.Val("samba_pwd", ""),
                     cfg.Val("samba_paths", ""));
