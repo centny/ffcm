@@ -40,6 +40,7 @@ namespace io.vty.cswf.ffcm.console
             var ffcmh = new FFCM(ffcm, ffcm.Srv);
             ffcm.InitConfig();
             ffcm.StartMonitor();
+            ffcm.StartWindowCloser();
             ffcm.Start();
             ffcm.StartProcSrv();
             if (cfg.Val("samba", "N") == "Y")
@@ -48,7 +49,7 @@ namespace io.vty.cswf.ffcm.console
                 var samba = Samba.AddVolume2(cfg.Val("samba_vol", ""), cfg.Val("samba_uri", ""),
                     cfg.Val("samba_user", ""), cfg.Val("samba_pwd", ""),
                     cfg.Val("samba_paths", ""));
-                samba.Fail = (s,e) =>
+                samba.Fail = (s, e) =>
                 {
                     ffcm.ChangeStatus(DTM_C.DCS_UNACTIVATED);
                 };
