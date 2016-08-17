@@ -49,13 +49,19 @@ namespace io.vty.cswf.ffcm.console
                 var samba = Samba.AddVolume2(cfg.Val("samba_vol", ""), cfg.Val("samba_uri", ""),
                     cfg.Val("samba_user", ""), cfg.Val("samba_pwd", ""),
                     cfg.Val("samba_paths", ""));
+                var activated = false;
                 samba.Fail = (s, e) =>
                 {
                     ffcm.ChangeStatus(DTM_C.DCS_UNACTIVATED);
+                    activated = false;
                 };
                 samba.Success = (s) =>
                 {
-                    ffcm.ChangeStatus(DTM_C.DCS_ACTIVATED);
+                    if (!activated)
+                    {
+                        ffcm.ChangeStatus(DTM_C.DCS_ACTIVATED);
+                        activated = true;
+                    }
                 };
                 new Thread(run_samba).Start();
             }
