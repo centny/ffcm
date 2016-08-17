@@ -1,6 +1,7 @@
 ﻿using io.vty.cswf.doc;
 using io.vty.cswf.log;
 using io.vty.cswf.netw.dtm;
+using io.vty.cswf.netw.rc;
 using io.vty.cswf.netw.sck;
 using io.vty.cswf.util;
 using System;
@@ -36,20 +37,21 @@ namespace io.vty.cswf.ffcm.console
             L.I("starting ffcm...");
 
             //Samba.
-            var ffcm = new DocCov("FFCM", cfg, new SckDailer(addr).Dail);
+            var lambah = new LambdaEvnH();
+            var ffcm = new DocCov("FFCM", cfg, new SckDailer(addr).Dail, lambah);
             var ffcmh = new FFCM(ffcm, ffcm.Srv);
             ffcm.InitConfig();
             ffcm.StartMonitor();
             ffcm.StartWindowCloser();
             ffcm.Start();
             ffcm.StartProcSrv();
+            var activated = false;
             if (cfg.Val("samba", "N") == "Y")
             {
                 L.I("start initial samba...");
                 var samba = Samba.AddVolume2(cfg.Val("samba_vol", ""), cfg.Val("samba_uri", ""),
                     cfg.Val("samba_user", ""), cfg.Val("samba_pwd", ""),
                     cfg.Val("samba_paths", ""));
-                var activated = false;
                 samba.Fail = (s, e) =>
                 {
                     ffcm.ChangeStatus(DTM_C.DCS_UNACTIVATED);
@@ -65,6 +67,21 @@ namespace io.vty.cswf.ffcm.console
                 };
                 new Thread(run_samba).Start();
             }
+            else
+            {
+                activated = true;
+            }
+            lambah.OnLogin = (nr, token) =>
+            {
+                if (activated)
+                {
+                    ffcm.ChangeStatus(DTM_C.DCS_ACTIVATED);
+                }
+            };
+            lambah.EndCon = (nr) =>
+            {
+                ffcm.ChangeStatus(DTM_C.DCS_UNACTIVATED);
+            };
             var reboot = cfg.Val("reboot", "");
             if (reboot.Length > 0)
             {
