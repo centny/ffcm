@@ -193,6 +193,10 @@ func do_cov(args []string) error {
 	if err != nil {
 		return err
 	}
+	_, err = ffcm.VerifyVideo(args[1], args[6])
+	if err != nil {
+		return err
+	}
 	src, err := os.OpenFile(args[6], os.O_RDONLY, os.ModePerm)
 	if err != nil {
 		return err
