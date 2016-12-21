@@ -136,7 +136,7 @@ func VerifyVideo(va, vb string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	if math.Abs(videoa.Duration-videob.Duration) < 2 {
+	if math.Abs(videoa.Duration-videob.Duration) > 2 {
 		return -1, fmt.Errorf("the duration verify fail to %v(%v),%v(%v)", va, videoa.Duration, vb, videob.Duration)
 	}
 	log.D("Verify duration ok by %v(%v),%v(%v)", va, videoa.Duration, vb, videob.Duration)
