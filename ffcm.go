@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/Centny/gwf/log"
 	"github.com/Centny/gwf/netw/dtm"
 	"github.com/Centny/gwf/util"
 )
@@ -121,18 +122,21 @@ func Dim2(whs []string) (string, error) {
 	return strings.Join(vals, "x"), err
 }
 
-func VerifyVideo(va, vb string) error {
+func VerifyVideo(va, vb string) (int, error) {
 	videoa, err := ParseVideo(va)
 	if err != nil {
-		return err
+		return 0, err
+	}
+	if videoa.Duration == 0 {
+		return 1, fmt.Errorf("zero source(%v)", va)
 	}
 	videob, err := ParseVideo(vb)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if int(videoa.Duration) != int(videob.Duration) {
-		return fmt.Errorf("the duration verify fail to %v(%v),%v(%v)", va, videoa.Duration, vb, videob.Duration)
+		return -1, fmt.Errorf("the duration verify fail to %v(%v),%v(%v)", va, videoa.Duration, vb, videob.Duration)
 	}
-	fmt.Printf("Verify duration ok by %v(%v),%v(%v)\n", va, videoa.Duration, vb, videob.Duration)
-	return nil
+	log.D("Verify duration ok by %v(%v),%v(%v)", va, videoa.Duration, vb, videob.Duration)
+	return 0, nil
 }

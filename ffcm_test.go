@@ -192,17 +192,17 @@ func TestMatch(t *testing.T) {
 // }
 
 func TestVerifyVideo(t *testing.T) {
-	err := VerifyVideo("xx.mp4", "xx.mp4")
+	_, err := VerifyVideo("xx.mp4", "xx.mp4")
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	err = VerifyVideo("xx.mp4x", "xx.mp4")
+	_, err = VerifyVideo("xx.mp4x", "xx.mp4")
 	if err == nil {
 		t.Error(err)
 		return
 	}
-	err = VerifyVideo("xx.mp4", "xx.mp4x")
+	_, err = VerifyVideo("xx.mp4", "xx.mp4x")
 	if err == nil {
 		t.Error(err)
 		return
