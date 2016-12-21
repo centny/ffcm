@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"time"
+
 	"github.com/Centny/ffcm"
 	"github.com/Centny/ffcm/mdb"
 	"github.com/Centny/gwf/log"
 	"github.com/Centny/gwf/netw/dtm"
 	"github.com/Centny/gwf/smartio"
 	"github.com/Centny/gwf/util"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"time"
 )
 
 func usage() {
@@ -23,6 +24,7 @@ func usage() {
 	ffcm -i <video file>						print video info
 	ffcm -g <http url>							send http get request
 	ffcm -c <process url> <input> <width> <height> <max_width> <max_height> <tmp> <out> <result> 
+	ffcm -verify <video first> <video second>	verify the two vidoe is having same duration.
 		`)
 }
 
@@ -102,6 +104,22 @@ func main() {
 		fmt.Println(err)
 		smartio.ResetStd()
 		time.Sleep(time.Second)
+	case "-verify":
+		if len(os.Args) < 4 {
+			usage()
+			ef(1)
+			return
+		}
+		err := ffcm.VerifyVideo(os.Args[2], os.Args[3])
+		if err == nil {
+			fmt.Println("Verify Success")
+			ef(0)
+		} else {
+			fmt.Println("Verify Fail")
+			fmt.Println(err)
+			ef(1)
+		}
+		return
 	case "-s":
 		var cfg = "conf/ffcm_s.properties"
 		if len(os.Args) > 2 {

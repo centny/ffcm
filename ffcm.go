@@ -2,10 +2,12 @@ package ffcm
 
 import (
 	"fmt"
-	"github.com/Centny/gwf/netw/dtm"
-	"github.com/Centny/gwf/util"
+	"os"
 	"regexp"
 	"strings"
+
+	"github.com/Centny/gwf/netw/dtm"
+	"github.com/Centny/gwf/util"
 )
 
 func init() {
@@ -118,4 +120,20 @@ func Dim(whs []string) ([]string, error) {
 func Dim2(whs []string) (string, error) {
 	vals, err := Dim(whs)
 	return strings.Join(vals, "x"), err
+}
+
+func VerifyVideo(va, vb string) error {
+	videoa, err := ParseVideo(os.Args[2])
+	if err != nil {
+		return err
+	}
+	videob, err := ParseVideo(os.Args[2])
+	if err != nil {
+		return err
+	}
+	if int(videoa.Duration) != int(videob.Duration) {
+		return fmt.Errorf("the duration verify fail to %v(%v),%v(%v)", va, videoa.Duration, vb, videob.Duration)
+	}
+	fmt.Printf("Verify duration ok by %v(%v),%v(%v)\n", va, videoa.Duration, vb, videob.Duration)
+	return nil
 }
