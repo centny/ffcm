@@ -110,7 +110,7 @@ func main() {
 			ef(1)
 			return
 		}
-		err := ffcm.VerifyVideo(os.Args[2], os.Args[3])
+		_, err := ffcm.VerifyVideo(os.Args[2], os.Args[3])
 		if err == nil {
 			fmt.Println("Verify Success")
 			ef(0)
