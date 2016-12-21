@@ -2,7 +2,6 @@ package ffcm
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
 
@@ -48,7 +47,7 @@ func ParseData(data, reg string) ([]*util.Fcfg, error) {
 func ParseFormat(path string) (*util.Fcfg, error) {
 	data, err := util.Exec(FFPROBE_C, "-show_format", path)
 	if err != nil {
-		return nil, util.Err("exec(%v) error->%v", FFPROBE_C, err)
+		return nil, util.Err("exec(%v -show_format %v) error->%v", FFPROBE_C, path, err)
 	}
 	cfgs, err := ParseData(data, "\\[[/]*FORMAT\\]")
 	var cfg *util.Fcfg
@@ -123,11 +122,11 @@ func Dim2(whs []string) (string, error) {
 }
 
 func VerifyVideo(va, vb string) error {
-	videoa, err := ParseVideo(os.Args[2])
+	videoa, err := ParseVideo(va)
 	if err != nil {
 		return err
 	}
-	videob, err := ParseVideo(os.Args[2])
+	videob, err := ParseVideo(vb)
 	if err != nil {
 		return err
 	}

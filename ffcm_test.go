@@ -3,13 +3,14 @@ package ffcm
 import (
 	"bytes"
 	"fmt"
-	"github.com/Centny/gwf/netw/dtm"
-	"github.com/Centny/gwf/routing/httptest"
-	"github.com/Centny/gwf/util"
 	"regexp"
 	"runtime"
 	"testing"
 	"time"
+
+	"github.com/Centny/gwf/netw/dtm"
+	"github.com/Centny/gwf/routing/httptest"
+	"github.com/Centny/gwf/util"
 )
 
 func TestParseVideo(t *testing.T) {
@@ -189,3 +190,21 @@ func TestMatch(t *testing.T) {
 // func TestExec(t *testing.T) {
 // 	fmt.Println(util.Exec("/usr/local/bin/ffmpeg -i ./xx.mp4 -s `/Users/vty/vgo/bin/ffcm -d 320 240 960 480` ./xx_phone.mp4"))
 // }
+
+func TestVerifyVideo(t *testing.T) {
+	err := VerifyVideo("xx.mp4", "xx.mp4")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	err = VerifyVideo("xx.mp4x", "xx.mp4")
+	if err == nil {
+		t.Error(err)
+		return
+	}
+	err = VerifyVideo("xx.mp4", "xx.mp4x")
+	if err == nil {
+		t.Error(err)
+		return
+	}
+}
