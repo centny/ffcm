@@ -46,13 +46,25 @@ func main() {
 			ef(1)
 			return
 		}
-	case "-cov":
+	case "-cov_v":
 		if len(os.Args) < 11 {
 			usage()
 			ef(1)
 			return
 		}
-		err := do_cov(os.Args[2:])
+		err := do_cov_video(os.Args[2:])
+		if err != nil {
+			fmt.Println(err)
+			ef(1)
+			return
+		}
+	case "-cov_a":
+		if len(os.Args) < 7 {
+			usage()
+			ef(1)
+			return
+		}
+		err := do_cov_audio(os.Args[2:])
 		if err != nil {
 			fmt.Println(err)
 			ef(1)
@@ -168,7 +180,7 @@ func redirect_l(fcfg *util.Fcfg) {
 	log.SetWriter(os.Stdout)
 }
 
-func do_cov(args []string) error {
+func do_cov_video(args []string) error {
 	fmt.Printf("run_ff arguments list:\n"+
 		"	%v\n	%v\n	%v\n	%v\n	%v\n	%v\n	%v\n	%v\n	%v\n",
 		args[0], args[1], args[2],
@@ -220,5 +232,51 @@ func do_cov(args []string) error {
 [/text]
 	
 	`, args[8])
+	return nil
+}
+
+func do_cov_audio(args []string) error {
+	fmt.Printf("run_ff arguments list:\n"+
+		"	%v\n	%v\n	%v\n	%v\n	%v\n",
+		args[0], args[1], args[2], args[3], args[4])
+	err := os.MkdirAll(filepath.Dir(args[2]), os.ModePerm)
+	if os.IsNotExist(err) {
+		return err
+	}
+	err = os.MkdirAll(filepath.Dir(args[3]), os.ModePerm)
+	if os.IsNotExist(err) {
+		return err
+	}
+	// exe := exec.Command("ffmpeg", "-progress", args[0], "-i", args[1], "-y", args[2])
+	exe := exec.Command("ffmpeg", "-i", args[1], "-y", args[2])
+	exe.Stderr = os.Stderr
+	exe.Stdout = os.Stdout
+	err = exe.Run()
+	if err != nil {
+		return err
+	}
+	src, err := os.OpenFile(args[2], os.O_RDONLY, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("do copy %v to %v...\n", args[2], args[3])
+	_, err = util.Copyp(args[3], src)
+	if err != nil {
+		src.Close()
+		return err
+	}
+	src.Close()
+	fmt.Printf("do clear tmp file %v...\n", args[2])
+	err = os.Remove(args[2])
+	if err != nil {
+		fmt.Printf("[Warning]remove tmp file %v fail", args[2])
+	}
+	fmt.Printf(`
+----------------result----------------
+[text]
+%v
+[/text]
+	
+	`, args[4])
 	return nil
 }

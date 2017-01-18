@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/Centny/gwf/routing"
-	"github.com/Centny/gwf/routing/httptest"
 	"io/ioutil"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/Centny/gwf/routing"
+	"github.com/Centny/gwf/routing/httptest"
 )
 
 func init() {
@@ -106,6 +107,8 @@ func TestCov(t *testing.T) {
 		ioutil.ReadAll(hs.R.Body)
 		return routing.HRES_RETURN
 	})
-	os.Args = []string{"ffmpeg", "-cov", ts.URL, "../xx.mp4", "1280", "720", "1024", "768", "tmp/abc.mp4", "out/abc.mp4", "abc.mp4"}
+	os.Args = []string{"ffmpeg", "-cov_v", ts.URL, "../xx.mp4", "1280", "720", "1024", "768", "tmp/abc.mp4", "out/abc.mp4", "abc.mp4"}
+	main()
+	os.Args = []string{"ffmpeg", "-cov_a", ts.URL, "../xx.amr", "tmp/abc.mp3", "out/abc.mp3", "abc.mp3"}
 	main()
 }
