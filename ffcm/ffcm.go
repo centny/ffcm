@@ -194,34 +194,38 @@ func do_cov_video(args []string) error {
 	if os.IsNotExist(err) {
 		return err
 	}
+	tmpi := fmt.Sprintf("%v_src%v", args[6], filepath.Ext(args[1]))
+	tmpo := fmt.Sprintf("%v_out%v", args[6], filepath.Ext(args[1]))
+	fmt.Printf("do copy %v to %v...\n", args[1], tmpi)
+	err = do_copy(args[1], tmpi)
+	if err != nil {
+		return err
+	}
 	res, err := ffcm.Dim2(args[2:6])
 	if err != nil {
 		return err
 	}
-	exe := exec.Command("ffmpeg", "-progress", args[0], "-i", args[1], "-s", res, "-y", args[6])
+	exe := exec.Command("ffmpeg", "-progress", args[0], "-i", tmpi, "-s", res, "-y", tmpo)
 	exe.Stderr = os.Stderr
 	exe.Stdout = os.Stdout
 	err = exe.Run()
 	if err != nil {
 		return err
 	}
-	_, err = ffcm.VerifyVideo(args[1], args[6])
+	_, err = ffcm.VerifyVideo(tmpi, tmpo)
 	if err != nil {
 		return err
 	}
-	src, err := os.OpenFile(args[6], os.O_RDONLY, os.ModePerm)
+	err = do_copy(tmpo, args[7])
 	if err != nil {
 		return err
 	}
-	fmt.Printf("do copy %v to %v...\n", args[6], args[7])
-	_, err = util.Copyp(args[7], src)
+	fmt.Printf("do clear tmp file %v,%v...\n", tmpi, tmpo)
+	err = os.Remove(tmpi)
 	if err != nil {
-		src.Close()
-		return err
+		fmt.Printf("[Warning]remove tmp file %v fail", args[6])
 	}
-	src.Close()
-	fmt.Printf("do clear tmp file %v...\n", args[6])
-	err = os.Remove(args[6])
+	err = os.Remove(tmpo)
 	if err != nil {
 		fmt.Printf("[Warning]remove tmp file %v fail", args[6])
 	}
@@ -233,6 +237,17 @@ func do_cov_video(args []string) error {
 	
 	`, args[8])
 	return nil
+}
+
+func do_copy(srcp, dstp string) error {
+	src, err := os.OpenFile(srcp, os.O_RDONLY, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+	fmt.Printf("do copy %v to %v...\n", srcp, dstp)
+	_, err = util.Copyp(dstp, src)
+	return err
 }
 
 func do_cov_audio(args []string) error {

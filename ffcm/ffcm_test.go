@@ -107,8 +107,20 @@ func TestCov(t *testing.T) {
 		ioutil.ReadAll(hs.R.Body)
 		return routing.HRES_RETURN
 	})
+	ecode := 0
+	ef = func(c int) {
+		ecode = c
+	}
 	os.Args = []string{"ffmpeg", "-cov_v", ts.URL, "../xx.mp4", "1280", "720", "1024", "768", "tmp/abc.mp4", "out/abc.mp4", "abc.mp4"}
 	main()
+	if ecode != 0 {
+		t.Error("error")
+		return
+	}
 	os.Args = []string{"ffmpeg", "-cov_a", ts.URL, "../xx.amr", "tmp/abc.mp3", "out/abc.mp3", "abc.mp3"}
 	main()
+	if ecode != 0 {
+		t.Error("error")
+		return
+	}
 }
