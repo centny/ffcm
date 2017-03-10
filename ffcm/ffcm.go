@@ -195,7 +195,7 @@ func do_cov_video(args []string) error {
 		return err
 	}
 	tmpi := fmt.Sprintf("%v_src%v", args[6], filepath.Ext(args[1]))
-	tmpo := fmt.Sprintf("%v_out%v", args[6], filepath.Ext(args[1]))
+	tmpo := fmt.Sprintf("%v_out%v", args[6], ".mp4")
 	fmt.Printf("do copy %v to %v...\n", args[1], tmpi)
 	err = do_copy(args[1], tmpi)
 	if err != nil {
