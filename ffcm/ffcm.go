@@ -205,6 +205,7 @@ func do_cov_video(args []string) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("exec:ffmpeg", "-progress", args[0], "-i", tmpi, "-s", res, "-y", tmpo)
 	exe := exec.Command("ffmpeg", "-progress", args[0], "-i", tmpi, "-s", res, "-y", tmpo)
 	exe.Stderr = os.Stderr
 	exe.Stdout = os.Stdout
