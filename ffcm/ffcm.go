@@ -264,7 +264,8 @@ func do_cov_audio(args []string) error {
 		return err
 	}
 	// exe := exec.Command("ffmpeg", "-progress", args[0], "-i", args[1], "-y", args[2])
-	exe := exec.Command("ffmpeg", "-i", args[1], "-y", args[2])
+	// exe := exec.Command("ffmpeg", "-i", args[1], "-y", args[2])
+	exe := exec.Command("ffmpeg", "-i", args[1], "-y", "-write_xing", "0", args[2])
 	exe.Stderr = os.Stderr
 	exe.Stdout = os.Stdout
 	err = exe.Run()
