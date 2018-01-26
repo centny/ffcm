@@ -7,6 +7,7 @@ using io.vty.cswf.util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ namespace io.vty.cswf.ffcm.console
         private static readonly ILog L = Log.New();
         static void Main(string[] args)
         {
+            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
             var conf = "conf/ffcm_c.properties";
             if (args.Length > 0)
             {
