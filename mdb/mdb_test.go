@@ -2,14 +2,15 @@ package mdb
 
 import (
 	"fmt"
-	"github.com/Centny/dbm/mgo"
-	"github.com/Centny/gwf/netw/dtm"
 	"testing"
 	"time"
+
+	"github.com/Centny/gwf/netw/dtm"
+	"w.gdy.io/dyf/mgo"
 )
 
 func TestMdb(t *testing.T) {
-	mgo.AddDefault2("cny:123@loc.w:27017/cny")
+	mgo.DialShared("mongodb://cny:123@loc.w:27017/cny")
 	dbh, err := DefaultDbc("", "")
 	if err != nil {
 		t.Error(err.Error())
@@ -34,7 +35,7 @@ func TestMdb(t *testing.T) {
 		t.Error(err.Error())
 		return
 	}
-	_, ts, err := dbh.List(nil, "", 0, 30)
+	_, ts, err := dbh.List("", nil, "", 0, 30)
 	if err != nil {
 		t.Error(err.Error())
 		return
@@ -58,7 +59,7 @@ func TestMdb(t *testing.T) {
 		t.Error("error")
 		return
 	}
-	_, ts, err = dbh.List(nil, "", 0, 30)
+	_, ts, err = dbh.List("", nil, "", 0, 30)
 	if err != nil {
 		t.Error(err.Error())
 		return
@@ -76,7 +77,7 @@ func TestMdb(t *testing.T) {
 	//
 	DefaultDbc("uri", "name")
 	//
-	mgo.AddDefault("cny:123@loc.w:27017/cny", "cny")
+	mgo.DialShared("mongodb://cny:123@loc.w:27017/cny")
 	StartTest("../ffcm_s.properties", "../ffcm_c.properties", dtm.NewDoNoneH())
 	//
 	time.Sleep(time.Second)

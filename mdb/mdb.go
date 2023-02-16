@@ -1,38 +1,37 @@
 package mdb
 
 import (
-	"github.com/Centny/dbm/mgo"
 	"github.com/Centny/ffcm"
 	"github.com/Centny/gwf/log"
 	"github.com/Centny/gwf/netw/dtm"
 	"github.com/Centny/gwf/util"
-	tmgo "gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"w.gdy.io/dyf/mgo"
+	"w.gdy.io/dyf/mgo/bson"
 )
 
 type MdbH struct {
 	Name string
-	MC   func(string) *tmgo.Collection
+	MC   func(string) *mgo.Collection
 }
 
-func (m *MdbH) C() *tmgo.Collection {
+func (m *MdbH) C() *mgo.Collection {
 	return m.MC(m.Name)
 }
 
-//add task to db
+// add task to db
 func (m *MdbH) Add(t *dtm.Task) error {
 	log.D("MdbH add task by id(%v)", t.Id)
 	t.Time = util.Now()
 	return m.C().Insert(t)
 }
 
-//update task to db
+// update task to db
 func (m *MdbH) Update(t *dtm.Task) error {
 	t.Time = util.Now()
 	return m.C().Update(bson.M{"_id": t.Id}, t)
 }
 
-//delete task to db
+// delete task to db
 func (m *MdbH) Del(t *dtm.Task) error {
 	log.D("MdbH delete task by id(%v)", t.Id)
 	return m.C().RemoveId(t.Id)
@@ -43,7 +42,7 @@ func (m *MdbH) ClearSyncTask() error {
 	return err
 }
 
-//list task from db
+// list task from db
 func (m *MdbH) List(mid string, running []string, status string, skip, limit int) (int, []*dtm.Task, error) {
 	if len(mid) > 0 {
 		_, err := m.C().UpdateAll(
@@ -95,7 +94,7 @@ func (m *MdbH) List(mid string, running []string, status string, skip, limit int
 	var rts []*dtm.Task
 	if len(mid) > 0 {
 		for _, t := range ts {
-			_, err = m.C().Find(bson.M{
+			err = m.C().Find(bson.M{
 				"$and": []bson.M{
 					bson.M{"_id": t.Id},
 					bson.M{"$or": []bson.M{
@@ -103,7 +102,7 @@ func (m *MdbH) List(mid string, running []string, status string, skip, limit int
 						bson.M{"mid": bson.M{"$exists": false}},
 					}},
 				},
-			}).Apply(tmgo.Change{
+			}).Apply(mgo.Change{
 				Update: bson.M{
 					"$set": bson.M{
 						"mid": mid,
@@ -112,7 +111,7 @@ func (m *MdbH) List(mid string, running []string, status string, skip, limit int
 			}, nil)
 			if err == nil {
 				rts = append(rts, t)
-			} else if err == tmgo.ErrNotFound {
+			} else if err == mgo.ErrNotFound {
 				continue
 			} else {
 				return 0, nil, err
@@ -128,7 +127,7 @@ func (m *MdbH) List(mid string, running []string, status string, skip, limit int
 	return total, rts, err
 }
 
-//find task by id
+// find task by id
 func (m *MdbH) Find(id string) (*dtm.Task, error) {
 	var ts []*dtm.Task
 	var err = m.C().Find(bson.M{"_id": id}).All(&ts)
@@ -143,13 +142,13 @@ func (m *MdbH) Find(id string) (*dtm.Task, error) {
 	return task, err
 }
 
-//database creator
+// database creator
 func MdbH_dc(uri, name string) (dtm.DbH, error) {
-	db, err := mgo.NewMDbs(uri, name)
+	db, err := mgo.DialShared("mongodb://" + name + "@" + uri)
 	if err == nil {
 		return &MdbH{
 			Name: "ffcm_task",
-			MC:   db.C,
+			MC:   db.Collection,
 		}, err
 	} else {
 		return nil, err
