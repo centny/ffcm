@@ -28,7 +28,7 @@ func (m *MdbH) Add(t *dtm.Task) error {
 // update task to db
 func (m *MdbH) Update(t *dtm.Task) error {
 	t.Time = util.Now()
-	return m.C().Update(bson.M{"_id": t.Id}, t)
+	return m.C().Update(bson.M{"_id": t.Id}, bson.M{"$set": t})
 }
 
 // delete task to db
