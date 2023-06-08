@@ -12,7 +12,7 @@ import (
 func TestMdb(t *testing.T) {
 	_, err := mgo.DialShared("mongodb://cny:123@loc.w:27017/cny")
 	if err != nil {
-		panic(fmt.Errorf("mgo.DialShared(%v) failed(%v)", "xxx", err))
+		panic(fmt.Errorf("mgo.DialShared(%v) failed(%v)", "mongodb://cny:123@loc.w:27017/cny", err))
 	}
 	dbh, err := DefaultDbc("", "")
 	if err != nil {
@@ -82,7 +82,7 @@ func TestMdb(t *testing.T) {
 	//
 	_, err = mgo.DialShared("mongodb://cny:123@loc.w:27017/cny")
 	if err != nil {
-		panic(fmt.Errorf("mgo.DialShared(%v) failed(%v)", "xxx", err))
+		panic(fmt.Errorf("mgo.DialShared(%v) failed(%v)", "mongodb://cny:123@loc.w:27017/cny", err))
 	}
 	StartTest("../ffcm_s.properties", "../ffcm_c.properties", dtm.NewDoNoneH())
 	//
