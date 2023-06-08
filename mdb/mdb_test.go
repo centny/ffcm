@@ -10,7 +10,10 @@ import (
 )
 
 func TestMdb(t *testing.T) {
-	mgo.DialShared("mongodb://cny:123@loc.w:27017/cny")
+	_, err := mgo.DialShared("mongodb://cny:123@loc.w:27017/cny")
+	if err != nil {
+		panic(fmt.Errorf("mgo.DialShared(%v) failed(%v)", "xxx", err))
+	}
 	dbh, err := DefaultDbc("", "")
 	if err != nil {
 		t.Error(err.Error())
@@ -77,7 +80,10 @@ func TestMdb(t *testing.T) {
 	//
 	DefaultDbc("uri", "name")
 	//
-	mgo.DialShared("mongodb://cny:123@loc.w:27017/cny")
+	_, err = mgo.DialShared("mongodb://cny:123@loc.w:27017/cny")
+	if err != nil {
+		panic(fmt.Errorf("mgo.DialShared(%v) failed(%v)", "xxx", err))
+	}
 	StartTest("../ffcm_s.properties", "../ffcm_c.properties", dtm.NewDoNoneH())
 	//
 	time.Sleep(time.Second)
